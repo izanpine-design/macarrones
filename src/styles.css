@@ -114,7 +114,7 @@ body {
 
 .page-intro__eyebrow {
   margin: 0 0 .6rem;
-  color: #a9503e;
+  color: var(--game-accent, #a9503e);
   font-size: .76rem;
   font-weight: 800;
   letter-spacing: .17em;
@@ -127,7 +127,7 @@ body {
   width: 13px;
   height: 9px;
   margin: 0 .55rem .08rem;
-  border: 2px solid #c4774f;
+  border: 2px solid var(--game-accent, #c4774f);
   border-right-color: transparent;
   border-radius: 7px 5px 5px 7px;
   content: '';
@@ -158,7 +158,7 @@ body {
 .page-crumb { margin-bottom: 1.5rem; }
 
 .pasta-link {
-  color: #8b4335;
+  color: var(--game-accent, #8b4335);
   font-weight: 700;
   text-decoration-color: rgb(139 67 53 / 35%);
   text-underline-offset: .2em;
@@ -198,7 +198,7 @@ body {
 }
 
 .site-main:not(:has(app-welcome)) .display-5 {
-  color: #8b4335;
+  color: var(--game-accent, #8b4335);
   letter-spacing: .13em;
 }
 
@@ -213,19 +213,19 @@ body {
   background: linear-gradient(145deg, #fffdf8 0%, #fff4dc 100%);
 }
 
-.site-main:not(:has(app-welcome)) .spinner-border { color: #a9503e; }
+.site-main:not(:has(app-welcome)) .spinner-border { color: var(--game-accent, #a9503e); }
 
 .site-main:not(:has(app-welcome)) .btn-primary,
 .site-main:not(:has(app-welcome)) .btn-outline-primary:hover,
 .site-main:not(:has(app-welcome)) .btn-outline-primary:focus-visible {
-  border-color: #a9503e;
+  border-color: var(--game-accent, #a9503e);
   color: #fff8e9;
-  background: #a9503e;
+  background: var(--game-accent, #a9503e);
 }
 
 .site-main:not(:has(app-welcome)) .btn-outline-primary {
-  border-color: #a9503e;
-  color: #8b4335;
+  border-color: var(--game-accent, #a9503e);
+  color: var(--game-accent, #8b4335);
 }
 
 .site-main:not(:has(app-welcome)) .form-control:focus,
@@ -237,8 +237,8 @@ body {
 .site-main:not(:has(app-welcome)) .form-control { border-radius: 12px; }
 
 .site-main:not(:has(app-welcome)) .form-check-input:checked {
-  border-color: #a9503e;
-  background-color: #a9503e;
+  border-color: var(--game-accent, #a9503e);
+  background-color: var(--game-accent, #a9503e);
 }
 
 .room-layout > [class*='col-'] { position: relative; }
@@ -249,4 +249,175 @@ body {
   .site-main:not(:has(app-welcome))::after { left: -13rem; }
   .page-intro__eyebrow::before,
   .page-intro__eyebrow::after { margin-inline: .25rem; }
+}
+
+/* ---------- Game planets: the backdrop replaces the pasta rings ---------- */
+
+/* The planet backdrop sits behind the page: let it show through the body. */
+html[data-game] body { background: transparent; }
+
+html[data-game] .site-main::before,
+html[data-game] .site-main::after { display: none; }
+
+html[data-game] .site-main:not(:has(app-welcome)) .card { background: rgb(255 255 255 / 92%); }
+
+.site-main:not(:has(app-welcome)) .alert-info {
+  border-color: color-mix(in srgb, var(--game-accent, #a9503e) 35%, transparent);
+  color: #2a2130;
+  background: color-mix(in srgb, var(--game-accent, #a9503e) 9%, #fff);
+}
+
+.site-main:not(:has(app-welcome)) .btn-check:checked + .btn-outline-primary {
+  border-color: var(--game-accent, #a9503e);
+  color: #fff;
+  background: var(--game-accent, #a9503e);
+}
+
+/* Keep the header and the pets still while pages transition. */
+.site-nav { view-transition-name: site-nav; }
+app-pet-layer { view-transition-name: pets; }
+
+/* ---------- Menu: every game is a macaroni tube ---------- */
+
+/* Long horizontal tubes: one per row, two on wide screens. */
+.site-main app-game-list .row > * { flex: 0 0 100%; max-width: 100%; }
+
+@media (min-width: 992px) {
+  .site-main app-game-list .row > * { flex: 0 0 50%; max-width: 50%; }
+}
+
+.site-main app-game-list .game-card {
+  --tube: var(--game-accent, #a9503e);
+  overflow: visible;
+  border: 0 !important;
+  border-left: 9px solid var(--tube) !important;
+  border-radius: 64px / 50% !important;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 26px, rgb(168 91 57 / 13%) 26px 29px),
+    linear-gradient(#fff4d6 0%, #f8d898 22%, #f0bb72 72%, #dc9a55 100%) !important;
+  box-shadow: inset 0 3px 0 rgb(255 255 255 / 55%), inset 0 -5px 0 rgb(150 80 40 / 18%), 0 10px 22px rgb(90 50 30 / 14%) !important;
+}
+
+.site-main app-game-list .game-card .card-body { padding: 1.2rem 3.9rem 1.2rem 1.7rem; }
+.site-main app-game-list .game-card .card-title a { color: #2c1d26 !important; }
+.site-main app-game-list .game-card .card-text { color: #4a3530 !important; }
+
+/* The tube's open end, and the game's thing peeking out of it. */
+.site-main app-game-list .game-card::before {
+  position: absolute;
+  top: 14%;
+  right: 12px;
+  width: 26px;
+  height: 72%;
+  border: 4px solid color-mix(in srgb, var(--tube) 70%, #f0bb72);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 40% 50%, #2b1a14 30%, #5a3322);
+  content: '';
+}
+
+.site-main app-game-list .game-card::after {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  font-size: 2.2rem;
+  line-height: 1;
+  content: var(--game-icon, '🍝');
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 35%));
+  transform: translate(-2px, -50%) scale(.9);
+  transition: transform 380ms cubic-bezier(.3, 1.7, .5, 1);
+  pointer-events: none;
+}
+
+.site-main app-game-list .game-card:hover::after,
+.site-main app-game-list .game-card:focus-within::after {
+  transform: translate(30px, -88%) rotate(14deg) scale(1.3);
+}
+
+.site-main app-game-list .game-card:hover,
+.site-main app-game-list .game-card:focus-within {
+  transform: translateY(-3px) rotate(-.6deg);
+}
+
+.site-main app-game-list .game-card:focus-within {
+  outline: 3px solid var(--tube) !important;
+  outline-offset: 3px;
+}
+
+/* Coming soon: raw pasta, a cork in the tube, nothing comes out yet. */
+.site-main app-game-list .game-card:has(.badge) {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 26px, rgb(168 91 57 / 9%) 26px 29px),
+    linear-gradient(#fbf4e4, #efe0bf 60%, #dcc79c) !important;
+}
+
+.site-main app-game-list .game-card:has(.badge)::before { background: radial-gradient(circle at 40% 40%, #c79a6b, #8a6441); }
+.site-main app-game-list .game-card:has(.badge)::after { opacity: .45; transform: translate(0, -50%) scale(.6); }
+
+.site-main app-game-list .game-card .badge {
+  border-radius: 4px;
+  color: #fff !important;
+  background: #3f3f46 !important;
+  transform: rotate(3deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-main app-game-list .game-card::after { transition: none; }
+}
+
+/* ---------- Page transitions (see shared/themes/game-transitions.ts) ---------- */
+
+html[data-vt]::view-transition-old(root),
+html[data-vt]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Entering: the new page arrives over the old one. Leaving: the old one goes away backwards. */
+html[data-vt='enter']::view-transition-new(root) { animation: var(--vt-in); animation-fill-mode: both; }
+html[data-vt='exit']::view-transition-old(root) { z-index: 1; animation: var(--vt-in); animation-direction: reverse; animation-fill-mode: both; }
+
+html[data-vt-style='warp'] { --vt-in: vt-warp 560ms cubic-bezier(.2, .8, .2, 1); }
+html[data-vt-style='dock'] { --vt-in: vt-dock 420ms cubic-bezier(.2, .8, .2, 1); }
+html[data-vt-style='fill'] { --vt-in: vt-fill 700ms cubic-bezier(.5, 0, .2, 1); }
+html[data-vt-style='iris'] { --vt-in: vt-iris 650ms cubic-bezier(.6, 0, .3, 1); }
+html[data-vt-style='spin'] { --vt-in: vt-spin 750ms cubic-bezier(.2, .9, .25, 1.05); }
+html[data-vt-style='blinds'] { --vt-in: vt-blinds 650ms steps(6, end); }
+html[data-vt-style='flip'] { --vt-in: vt-flip 650ms cubic-bezier(.3, .7, .3, 1); }
+html[data-vt-style='glitch'] { --vt-in: vt-glitch 560ms linear; }
+html[data-vt-style='pop'] { --vt-in: vt-pop 560ms cubic-bezier(.3, 1.5, .5, 1); }
+html[data-vt-style='curtain'] { --vt-in: vt-curtain 700ms cubic-bezier(.6, 0, .3, 1); }
+html[data-vt-style='wipe'] { --vt-in: vt-wipe 620ms cubic-bezier(.6, 0, .3, 1); }
+html[data-vt-style='stack'] { --vt-in: vt-stack 620ms cubic-bezier(.3, 1.4, .5, 1); }
+html[data-vt-style='bubble'] { --vt-in: vt-bubble 560ms cubic-bezier(.3, 1.5, .5, 1); }
+
+html[data-vt-style='blinds']::view-transition-new(root),
+html[data-vt-style='blinds']::view-transition-old(root) {
+  mask: linear-gradient(#000 var(--blind), transparent 0) 0 0 / 100% 56px repeat;
+}
+
+html[data-vt-style='bubble']::view-transition-new(root),
+html[data-vt-style='bubble']::view-transition-old(root) { transform-origin: 12% 88%; }
+
+@property --blind { syntax: '<percentage>'; inherits: false; initial-value: 100%; }
+
+@keyframes vt-warp { from { opacity: 0; filter: blur(10px); transform: scale(1.7); } }
+@keyframes vt-dock { from { opacity: 0; transform: translateX(30%); } }
+@keyframes vt-fill { from { clip-path: inset(100% 0 0 0); } }
+@keyframes vt-iris { from { clip-path: circle(0% at 50% 38%); } to { clip-path: circle(150% at 50% 38%); } }
+@keyframes vt-spin { from { clip-path: circle(0% at 50% 50%); transform: rotate(-300deg) scale(.2); } to { clip-path: circle(150% at 50% 50%); } }
+@keyframes vt-blinds { from { --blind: 0%; } to { --blind: 100%; } }
+@keyframes vt-flip { from { opacity: 0; transform: perspective(1400px) rotateY(-95deg); } 55% { opacity: 1; } }
+@keyframes vt-pop { from { opacity: 0; clip-path: circle(12% at 50% 50%); transform: scale(.45); } 70% { opacity: 1; } to { clip-path: circle(150% at 50% 50%); } }
+@keyframes vt-curtain { from { clip-path: inset(0 50% 0 50%); } to { clip-path: inset(0); } }
+@keyframes vt-wipe { from { clip-path: polygon(0 0, 0 0, -25% 100%, 0 100%); } to { clip-path: polygon(0 0, 125% 0, 100% 100%, 0 100%); } }
+@keyframes vt-stack { from { transform: translateY(100%); } }
+@keyframes vt-bubble { from { opacity: 0; transform: scale(.1); } 60% { opacity: 1; } }
+
+@keyframes vt-glitch {
+  0% { clip-path: inset(0 0 100% 0); filter: hue-rotate(90deg) saturate(3); transform: translateX(-14px); }
+  20% { clip-path: inset(0 0 55% 0); transform: translateX(12px); }
+  40% { clip-path: inset(25% 0 15% 0); filter: hue-rotate(-70deg) saturate(2); transform: translateX(-8px); }
+  60% { clip-path: inset(0 0 8% 0); filter: invert(.15) saturate(2); transform: translateX(5px); }
+  80% { clip-path: inset(0); filter: none; transform: translateX(-2px); }
+  100% { clip-path: inset(0); transform: none; }
 }

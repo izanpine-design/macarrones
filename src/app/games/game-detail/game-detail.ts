@@ -1,18 +1,19 @@
 import { Component, computed, effect, inject, input, numberAttribute, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { Game } from '../../core/question.model';
 import { GameService } from '../../core/game.service';
 import { PLAYABLE_GAMES } from '../../core/room.model';
 import { CreateRoomForm } from '../../rooms/create-room-form';
 import { JoinByCodeForm } from '../../rooms/join-by-code-form';
 import { OpenRoomList } from '../../rooms/open-room-list';
+import { BackButton } from '../../shared/back-button/back-button';
+import { PlanetBadge } from '../../shared/themes/planet-badge';
 
 @Component({
   selector: 'app-game-detail',
-  imports: [RouterLink, CreateRoomForm, JoinByCodeForm, OpenRoomList],
+  imports: [CreateRoomForm, JoinByCodeForm, OpenRoomList, BackButton, PlanetBadge],
   template: `
     <nav class="page-crumb" aria-label="Navegación">
-      <a routerLink="/juegos" class="pasta-link">← Volver al menú de la tripulación</a>
+      <app-back-button label="Menú de juegos" link="/juegos" />
     </nav>
 
     @if (loading()) {
@@ -24,6 +25,7 @@ import { OpenRoomList } from '../../rooms/open-room-list';
       <div class="alert alert-danger" role="alert">No se ha podido cargar el juego: {{ error() }}</div>
     } @else if (game(); as game) {
       <section class="page-intro page-intro--compact" aria-labelledby="game-title">
+        <app-planet-badge />
         <p class="page-intro__eyebrow">A preparar el viaje</p>
         <h1 id="game-title" class="page-title">{{ game.nombre }}</h1>
         <p class="page-intro__copy">

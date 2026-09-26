@@ -6,6 +6,9 @@ import { TurnService } from '../core/turn.service';
 import { RoomLobby } from './room-lobby';
 import { RoomPasswordForm } from './room-password-form';
 import { TruthOrDareGame } from './truth-or-dare/truth-or-dare-game';
+import { BackButton } from '../shared/back-button/back-button';
+import { GameThemeService } from '../shared/themes/game-theme.service';
+import { PlanetBadge } from '../shared/themes/planet-badge';
 
 /**
  * /sala/:codigo — entry point of invite links. Rooms without password are
@@ -15,9 +18,23 @@ import { TruthOrDareGame } from './truth-or-dare/truth-or-dare-game';
  */
 @Component({
   selector: 'app-room-page',
-  imports: [RouterLink, RoomLobby, RoomPasswordForm, TruthOrDareGame],
+  imports: [RouterLink, RoomLobby, RoomPasswordForm, TruthOrDareGame, BackButton, PlanetBadge],
   template: `
+    <nav class="page-crumb" aria-label="Navegación">
+      @if (room()?.soy_miembro) {
+        <app-back-button
+          label="Menú de juegos"
+          confirmLabel="¿Salir de la sala? Toca otra vez"
+          [busy]="leaving()"
+          (go)="leave(room()!, ['/juegos'])"
+        />
+      } @else {
+        <app-back-button label="Menú de juegos" link="/juegos" />
+      }
+    </nav>
+
     <section class="page-intro page-intro--compact" aria-label="Sala de juego">
+      <app-planet-badge />
       <p class="page-intro__eyebrow">Estación de la tripulación</p>
       <h1 class="page-title">¡Pasta a la vista!</h1>
       <p class="page-intro__copy">La pandilla está a punto de despegar.</p>
@@ -64,6 +81,7 @@ export class RoomPage {
   private readonly rooms = inject(RoomService);
   private readonly turns = inject(TurnService);
   private readonly router = inject(Router);
+  private readonly themes = inject(GameThemeService);
 
   /** Route parameter `:codigo`. */
   readonly codigo = input.required<string>();
@@ -103,6 +121,7 @@ export class RoomPage {
         this.watch(room.id);
       }
       this.room.set(room);
+      this.themes.reportRoomGame(room?.juego_clave);
     } catch (e) {
       this.error.set(roomErrorMessage(e));
     } finally {
@@ -110,13 +129,13 @@ export class RoomPage {
     }
   }
 
-  protected async leave(room: RoomInfo): Promise<void> {
+  protected async leave(room: RoomInfo, destination: unknown[] = ['/juegos', room.juego_id]): Promise<void> {
     this.leaving.set(true);
     try {
       this.stopWatching?.();
       this.stopWatching = null;
       await this.rooms.leaveRoom(room.id);
-      await this.router.navigate(['/juegos', room.juego_id]);
+      await this.router.navigate(destination);
     } catch (e) {
       this.error.set(roomErrorMessage(e));
       this.leaving.set(false);

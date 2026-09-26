@@ -1,0 +1,34 @@
+@if (theme(); as t) {
+  <div class="backdrop">
+    <svg class="backdrop__planet" viewBox="0 0 200 200" focusable="false">
+      <defs>
+        <radialGradient id="backdrop-planet" cx=".35" cy=".3" r=".8">
+          <stop offset="0" [attr.stop-color]="t.planet[0]" />
+          <stop offset="1" [attr.stop-color]="t.planet[1]" />
+        </radialGradient>
+      </defs>
+      @if (t.ring) {
+        <ellipse cx="100" cy="100" rx="96" ry="22" fill="none" [attr.stroke]="t.planet[1]" stroke-opacity=".35" stroke-width="7" transform="rotate(-18 100 100)" />
+      }
+      <circle cx="100" cy="100" r="62" fill="url(#backdrop-planet)" />
+      <circle cx="78" cy="84" r="9" [attr.fill]="t.planet[1]" fill-opacity=".22" />
+      <circle cx="118" cy="120" r="13" [attr.fill]="t.planet[1]" fill-opacity=".18" />
+      <circle cx="122" cy="76" r="5" [attr.fill]="t.planet[1]" fill-opacity=".25" />
+      <path d="M52 112Q100 140 148 104" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="6" stroke-linecap="round" />
+      @if (t.ring) {
+        <path d="M8 125A96 22 0 0 0 190 66" fill="none" [attr.stroke]="t.planet[1]" stroke-opacity=".45" stroke-width="7" transform="rotate(-18 100 100)" />
+      }
+    </svg>
+    <div class="backdrop__moon"></div>
+    @for (prop of props(); track $index) {
+      <span
+        class="backdrop__prop"
+        [style.left.%]="prop.x"
+        [style.top.%]="prop.y"
+        [style.font-size.px]="prop.size"
+        [style.animation-delay.s]="prop.delay"
+        >{{ prop.icon }}</span
+      >
+    }
+  </div>
+}

@@ -2,9 +2,10 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { PlayerService } from './core/player.service';
 import { PetLayer } from './shared/pets/pet-layer';
+import { GameBackdrop } from './shared/themes/game-backdrop';
 
 @Component({
-  imports: [RouterLink, RouterOutlet, PetLayer],
+  imports: [RouterLink, RouterOutlet, PetLayer, GameBackdrop],
   selector: 'app-root',
   templateUrl: './app.html',
 })
