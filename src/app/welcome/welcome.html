@@ -6,21 +6,32 @@
       <div [class]="'rocket rocket--' + slot">
         <!-- Keep the portrait space identical for every macaroni; replace FOTO with an image later. -->
         <div class="rocket__pilot-slot"><span>FOTO</span></div>
-        <svg class="rocket__body" viewBox="0 0 180 110" role="presentation" focusable="false">
+        <svg class="rocket__body" viewBox="0 0 250 120" role="presentation" focusable="false">
           <defs>
-            <linearGradient [attr.id]="'macaroni-pasta-' + slot" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ffe0a0" />
-              <stop offset=".55" stop-color="#f2bf70" />
-              <stop offset="1" stop-color="#d99250" />
+            <linearGradient [attr.id]="'macaroni-shell-' + slot" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff0c8" />
+              <stop offset=".2" stop-color="#f6d38e" />
+              <stop offset=".58" stop-color="#e9ad5e" />
+              <stop offset=".86" stop-color="#cb7940" />
+              <stop offset="1" stop-color="#f0bd70" />
+            </linearGradient>
+            <linearGradient [attr.id]="'macaroni-rim-' + slot" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#a95036" />
+              <stop offset=".42" stop-color="#e9a95f" />
+              <stop offset="1" stop-color="#ffdfa0" />
             </linearGradient>
           </defs>
-          <path d="M23 96V63C23 41 41 23 63 23H157" fill="none" stroke="#9c4c34" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M23 96V63C23 41 41 23 63 23H157" fill="none" [attr.stroke]="'url(#macaroni-pasta-' + slot + ')'" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M10 77H36M85 7V39M111 7V39M137 7V39" fill="none" stroke="#b56f42" stroke-width="2.5" stroke-linecap="round" opacity=".62" />
-          <ellipse cx="157" cy="23" rx="9" ry="15" fill="#b76c45" />
-          <ellipse cx="159" cy="23" rx="4.5" ry="9" fill="#704537" />
-          <ellipse cx="23" cy="96" rx="15" ry="9" fill="#b76c45" />
-          <ellipse cx="23" cy="98" rx="9" ry="4.5" fill="#704537" />
+          <path d="M43 27H207A18 33 0 0 1 207 93H43A18 33 0 0 1 43 27Z" fill="#984d35" transform="translate(0 4)" />
+          <path d="M43 27H207A18 33 0 0 1 207 93H43A18 33 0 0 1 43 27Z" [attr.fill]="'url(#macaroni-shell-' + slot + ')'" stroke="#a85b39" stroke-width="2" />
+          <path d="M62 34C58 46 58 74 62 86M91 28C87 44 87 76 91 92M122 28C118 44 118 76 122 92M153 28C149 44 149 76 153 92M184 29C180 45 180 75 184 91" fill="none" stroke="#a95e39" stroke-width="2.5" opacity=".48" />
+          <path d="M60 36C97 31 151 32 186 35" fill="none" stroke="#fff5dc" stroke-width="3" stroke-linecap="round" opacity=".72" />
+          <path d="M67 83C104 88 150 87 185 84" fill="none" stroke="#9d5736" stroke-width="3" stroke-linecap="round" opacity=".24" />
+          <ellipse cx="207" cy="60" rx="17" ry="32" [attr.fill]="'url(#macaroni-rim-' + slot + ')'" stroke="#ffdfa0" stroke-width="1.5" />
+          <ellipse cx="209" cy="60" rx="8" ry="20" fill="#69422f" />
+          <ellipse cx="210" cy="60" rx="4" ry="14" fill="#332a2b" />
+          <ellipse cx="43" cy="60" rx="16" ry="31" fill="#c47742" stroke="#f3c47c" stroke-width="2" />
+          <ellipse cx="41" cy="60" rx="8" ry="20" fill="#70442f" />
+          <ellipse cx="40" cy="60" rx="4" ry="14" fill="#382b2b" />
         </svg>
         <div class="rocket__flame"></div>
       </div>

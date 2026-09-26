@@ -185,8 +185,8 @@
   position: absolute;
   top: var(--flight-top, 15%);
   left: 0;
-  width: 176px;
-  height: 112px;
+  width: 236px;
+  height: 124px;
   opacity: 0;
   animation: fly-by 19s linear infinite;
   animation-delay: var(--flight-delay, 0s);
@@ -196,7 +196,7 @@
 .rocket::after {
   position: absolute;
   z-index: 0;
-  left: -75px;
+  left: -112px;
   height: 3px;
   border-radius: 50%;
   background: linear-gradient(90deg, transparent, rgb(255 158 74 / 10%), rgb(255 188 103 / 72%));
@@ -204,13 +204,13 @@
   filter: blur(1px);
 }
 
-.rocket::before { top: 81px; width: 104px; }
-.rocket::after { top: 91px; left: -50px; width: 70px; opacity: .65; }
+.rocket::before { top: 58px; width: 142px; }
+.rocket::after { top: 68px; left: -72px; width: 100px; opacity: .65; }
 
 .rocket--0 { --flight-top: 13%; --flight-delay: -17s; animation-duration: 17s; }
-.rocket--1 { --flight-top: 33%; --flight-delay: -8s; animation-name: fly-loop; animation-duration: 14s; }
-.rocket--2 { --flight-top: 73%; --flight-delay: -12s; animation-name: fly-swoop; animation-duration: 21s; }
-.rocket--3 { --flight-top: 87%; --flight-delay: -3s; animation-name: fly-loop; animation-duration: 15s; }
+.rocket--1 { --flight-top: 33%; --flight-delay: -8s; animation-name: fly-swoop; animation-duration: 14s; }
+.rocket--2 { --flight-top: 73%; --flight-delay: -12s; animation-name: fly-high; animation-duration: 21s; }
+.rocket--3 { --flight-top: 87%; --flight-delay: -3s; animation-name: fly-swoop; animation-duration: 15s; }
 .rocket--4 { --flight-top: 56%; --flight-delay: -15s; animation-duration: 19s; }
 
 .rocket__body {
@@ -218,8 +218,8 @@
   z-index: 1;
   right: 0;
   bottom: 0;
-  width: 176px;
-  height: 108px;
+  width: 236px;
+  height: 120px;
   overflow: visible;
   filter: drop-shadow(0 7px 7px rgb(0 0 0 / 22%));
 }
@@ -227,18 +227,18 @@
 .rocket__pilot-slot {
   position: absolute;
   z-index: 2;
-  top: 0;
-  left: 67px;
+  top: 1px;
+  left: 91px;
   display: grid;
-  width: 50px;
-  height: 50px;
+  width: 62px;
+  height: 62px;
   overflow: hidden;
   place-items: center;
-  border: 3px dashed #fff3d5;
+  border: 3px solid #fff0c9;
   border-radius: 50%;
   color: #fff3d5;
   background: #74566b;
-  box-shadow: 0 0 0 4px #d69062, 0 5px 14px rgb(0 0 0 / 25%);
+  box-shadow: 0 0 0 4px #c58a50, inset 0 0 0 2px rgb(255 255 255 / 22%), 0 5px 14px rgb(0 0 0 / 25%);
   font-size: .55rem;
   font-weight: 900;
   letter-spacing: .08em;
@@ -248,11 +248,11 @@
 
 .rocket__flame {
   position: absolute;
-  z-index: 2;
-  top: 82px;
-  left: -6px;
-  width: 46px;
-  height: 17px;
+  z-index: 0;
+  top: 48px;
+  left: -24px;
+  width: 74px;
+  height: 25px;
   border-radius: 80% 15% 15% 80%;
   background: linear-gradient(90deg, transparent, #ed5d3e 28%, #ffdc77 78%, #fff2bf);
   filter: drop-shadow(0 0 8px #ff884d);
@@ -271,31 +271,31 @@
 }
 
 @keyframes fly-by {
-  0% { transform: translate(-28vw, 8vh) rotate(-22deg) scale(.76); opacity: 0; }
+  0% { transform: translate(-28vw, 7vh) rotate(-8deg) scale(.78); opacity: 0; }
   8% { opacity: .96; }
-  29% { transform: translate(13vw, -5vh) rotate(11deg) scale(1.05); }
-  58% { transform: translate(61vw, 7vh) rotate(-12deg) scale(.9); }
+  27% { transform: translate(12vw, -3vh) rotate(5deg) scale(1.03); }
+  61% { transform: translate(64vw, 4vh) rotate(-4deg) scale(.94); }
   91% { opacity: .96; }
-  100% { transform: translate(112vw, -5vh) rotate(18deg) scale(.78); opacity: 0; }
-}
-
-@keyframes fly-loop {
-  0% { transform: translate(-25vw, 13vh) rotate(-38deg) scale(.72); opacity: 0; }
-  8% { opacity: .96; }
-  24% { transform: translate(5vw, -4vh) rotate(44deg) scale(1.05); }
-  51% { transform: translate(45vw, 9vh) rotate(172deg) scale(.84); }
-  76% { transform: translate(82vw, -8vh) rotate(278deg) scale(1.08); }
-  92% { opacity: .96; }
-  100% { transform: translate(116vw, 2vh) rotate(365deg) scale(.75); opacity: 0; }
+  100% { transform: translate(112vw, -3vh) rotate(7deg) scale(.82); opacity: 0; }
 }
 
 @keyframes fly-swoop {
-  0% { transform: translate(-28vw, -7vh) rotate(17deg) scale(.78); opacity: 0; }
+  0% { transform: translate(-27vw, 11vh) rotate(8deg) scale(.74); opacity: 0; }
   8% { opacity: .96; }
-  34% { transform: translate(22vw, 16vh) rotate(-27deg) scale(1.04); }
-  68% { transform: translate(73vw, -12vh) rotate(19deg) scale(.86); }
+  26% { transform: translate(10vw, -8vh) rotate(-10deg) scale(1.04); }
+  55% { transform: translate(50vw, 5vh) rotate(7deg) scale(.9); }
+  78% { transform: translate(86vw, -5vh) rotate(-6deg) scale(1.02); }
   92% { opacity: .96; }
-  100% { transform: translate(115vw, 5vh) rotate(-14deg) scale(.75); opacity: 0; }
+  100% { transform: translate(116vw, 4vh) rotate(9deg) scale(.8); opacity: 0; }
+}
+
+@keyframes fly-high {
+  0% { transform: translate(-28vw, -9vh) rotate(-5deg) scale(.76); opacity: 0; }
+  8% { opacity: .96; }
+  32% { transform: translate(21vw, 5vh) rotate(7deg) scale(1.02); }
+  66% { transform: translate(71vw, -8vh) rotate(-8deg) scale(.88); }
+  92% { opacity: .96; }
+  100% { transform: translate(115vw, 1vh) rotate(4deg) scale(.78); opacity: 0; }
 }
 
 @keyframes flame-flicker {
@@ -313,7 +313,7 @@
   .welcome-content h1 { font-size: clamp(2.8rem, 12vw, 4.5rem); }
   .welcome-content__intro { max-width: 21rem; margin: .9rem auto 1.2rem; }
   .nickname-card { padding: 1.3rem 1.2rem 1.4rem; }
-  .rocket { scale: .76; }
+  .rocket { scale: .78; }
   .rocket--0 { --flight-top: 8%; animation-duration: 15s; }
   .rocket--1 { --flight-top: 24%; animation-duration: 13s; }
   .rocket--2 { --flight-top: 68%; animation-duration: 18s; }
