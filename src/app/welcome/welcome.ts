@@ -4,13 +4,14 @@ import { form, FormField, maxLength, submit, validate } from '@angular/forms/sig
 import { PlayerService } from '../core/player.service';
 import { RocketSky } from '../shared/rockets/rocket-sky';
 import { SfxService } from '../shared/sfx/sfx.service';
+import { SpaceSky } from '../shared/space/space-sky';
 
 export const NICKNAME_MIN_LENGTH = 2;
 export const NICKNAME_MAX_LENGTH = 20;
 
 @Component({
   selector: 'app-welcome',
-  imports: [FormField, RocketSky],
+  imports: [FormField, RocketSky, SpaceSky],
   templateUrl: './welcome.html',
   styleUrl: './welcome.css',
 })
