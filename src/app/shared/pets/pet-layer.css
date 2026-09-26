@@ -1,0 +1,94 @@
+:host {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  user-select: none;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pet--hidden { visibility: hidden; pointer-events: none; }
+.pet--drop { pointer-events: none; }
+
+.pet__body {
+  width: 72px;
+  /* A thin light rim keeps the black cat visible on the dark space background. */
+  filter: drop-shadow(0 0 1px rgb(255 248 230 / 75%)) drop-shadow(0 3px 2px rgb(0 0 0 / 28%));
+  transform: scaleX(var(--facing, 1));
+}
+
+.pet__chute {
+  position: absolute;
+  bottom: 62%;
+  left: 12%;
+  width: 76%;
+  animation: chute-sway 1.4s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+
+.pet--drop .pet__body { animation: dangle 1.4s ease-in-out infinite alternate; transform-origin: 50% 0; }
+
+.pet--sleep .pet__body > * { animation: breathe 2.6s ease-in-out infinite; transform-origin: 50% 100%; }
+
+.pet__zzz { display: none; }
+
+.pet--sleep .pet__zzz {
+  position: absolute;
+  top: -14px;
+  right: 2px;
+  display: block;
+  color: #fff2cc;
+  font: 800 13px/1 ui-monospace, monospace;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
+  animation: zzz 2.6s ease-in-out infinite;
+}
+
+.pet__zzz span { position: relative; top: -6px; font-size: 1.15em; }
+.pet__zzz span + span { top: -13px; font-size: 1.3em; }
+
+.pet--hop .pet__body { animation: hop 520ms cubic-bezier(.3, 1.6, .5, 1); }
+
+.pet__heart {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #5a1731;
+  background: #ffe0ea;
+  font: 800 12px/1.3 system-ui, sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 25%);
+  animation: heart 900ms ease-out forwards;
+}
+
+@keyframes chute-sway { from { rotate: -9deg; } to { rotate: 9deg; } }
+@keyframes dangle { from { rotate: 7deg; } to { rotate: -7deg; } }
+@keyframes breathe { 50% { transform: scaleY(1.06); } }
+@keyframes zzz { 0%, 100% { opacity: .35; translate: 0 2px; } 50% { opacity: 1; translate: 3px -3px; } }
+@keyframes hop { 40% { translate: 0 -26px; } }
+
+@keyframes heart {
+  from { opacity: 0; transform: translate(-50%, 6px) scale(.6); }
+  25% { opacity: 1; transform: translate(-50%, -4px) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -26px) scale(1); }
+}
+
+@media (max-width: 600px) {
+  .pet__body { width: 54px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet__chute, .pet__body, .pet__body > *, .pet__zzz { animation: none !important; }
+}

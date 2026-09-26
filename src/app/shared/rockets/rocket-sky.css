@@ -1,0 +1,40 @@
+:host {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sky__trail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.sky__ship {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 190px;
+  cursor: crosshair;
+  opacity: 0;
+  pointer-events: auto;
+  touch-action: manipulation;
+  user-select: none;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Bigger target than the drawing: rockets move fast under a finger. */
+.sky__ship::before {
+  position: absolute;
+  inset: -16px -8px;
+  content: '';
+}
+
+@media (max-width: 600px) {
+  .sky__ship { width: 132px; }
+}

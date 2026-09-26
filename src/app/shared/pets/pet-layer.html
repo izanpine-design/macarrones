@@ -1,0 +1,22 @@
+@for (pet of pets; track pet.id) {
+  <div
+    class="pet"
+    [attr.data-pet]="pet.id"
+    [class.pet--hidden]="modes()[pet.id] === 'hidden'"
+    [class.pet--drop]="modes()[pet.id] === 'drop'"
+    [class.pet--sleep]="modes()[pet.id] === 'sleep'"
+    [class.pet--hop]="hopping() === pet.id"
+    (pointerdown)="pat(pet.id)"
+  >
+    @if (modes()[pet.id] === 'drop') {
+      <app-pixel-sprite class="pet__chute" [frame]="parachute" [palette]="pet.chutePalette" />
+    }
+    <div class="pet__body">
+      <app-pixel-sprite [frame]="pet.art.frames[poses()[pet.id]]" [palette]="pet.art.palette" />
+    </div>
+    <span class="pet__zzz">z<span>z</span><span>z</span></span>
+    @if (hopping() === pet.id) {
+      <span class="pet__heart">♥ {{ pet.nombre }}</span>
+    }
+  </div>
+}

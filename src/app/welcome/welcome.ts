@@ -2,13 +2,15 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { form, FormField, maxLength, submit, validate } from '@angular/forms/signals';
 import { PlayerService } from '../core/player.service';
+import { RocketSky } from '../shared/rockets/rocket-sky';
+import { SfxService } from '../shared/sfx/sfx.service';
 
 export const NICKNAME_MIN_LENGTH = 2;
 export const NICKNAME_MAX_LENGTH = 20;
 
 @Component({
   selector: 'app-welcome',
-  imports: [FormField],
+  imports: [FormField, RocketSky],
   templateUrl: './welcome.html',
   styleUrl: './welcome.css',
 })
@@ -19,8 +21,7 @@ export class Welcome {
   /** Query param `?volver=` set by nicknameGuard (e.g. an invite link). */
   readonly volver = input<string>();
 
-  /** Fixed decorative slots ready for future portrait images. */
-  protected readonly rocketSlots = [0, 1, 2, 3, 4];
+  protected readonly sfx = inject(SfxService);
   protected readonly minLength = NICKNAME_MIN_LENGTH;
   protected readonly maxLength = NICKNAME_MAX_LENGTH;
 
