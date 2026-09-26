@@ -7,6 +7,7 @@ import { RoomLobby } from './room-lobby';
 import { RoomPasswordForm } from './room-password-form';
 import { TruthOrDareGame } from './truth-or-dare/truth-or-dare-game';
 import { BackButton } from '../shared/back-button/back-button';
+import { DrinkAlert } from '../shared/drink/drink-alert';
 import { GameThemeService } from '../shared/themes/game-theme.service';
 import { PlanetBadge } from '../shared/themes/planet-badge';
 
@@ -18,7 +19,7 @@ import { PlanetBadge } from '../shared/themes/planet-badge';
  */
 @Component({
   selector: 'app-room-page',
-  imports: [RouterLink, RoomLobby, RoomPasswordForm, TruthOrDareGame, BackButton, PlanetBadge],
+  imports: [RouterLink, RoomLobby, RoomPasswordForm, TruthOrDareGame, BackButton, PlanetBadge, DrinkAlert],
   template: `
     <nav class="page-crumb" aria-label="Navegación">
       @if (room()?.soy_miembro) {
@@ -52,6 +53,7 @@ import { PlanetBadge } from '../shared/themes/planet-badge';
           <a routerLink="/juegos" class="link-primary">← Volver a los juegos</a>
         } @else if (room(); as room) {
           @if (room.soy_miembro) {
+            <app-drink-alert [roomId]="room.id" />
             @if (room.estado === 'jugando' && turn(); as turn) {
               <app-truth-or-dare-game [room]="room" [turn]="turn" [hostId]="hostId()" />
             } @else {

@@ -1,4 +1,4 @@
-import { MIDDLE_FINGER, PARACHUTE, PET_ART, PixelFrame } from './pixel-art';
+import { BEER_MUG, MIDDLE_FINGER, PARACHUTE, PET_ART, PixelFrame } from './pixel-art';
 
 function expectRectangular(frame: PixelFrame): void {
   const width = frame[0].length;
@@ -23,5 +23,6 @@ describe('pixel art', () => {
   it('extras are rectangular', () => {
     expectRectangular(MIDDLE_FINGER);
     expectRectangular(PARACHUTE);
+    expectRectangular(BEER_MUG);
   });
 });

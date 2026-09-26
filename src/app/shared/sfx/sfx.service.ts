@@ -2,7 +2,7 @@ import { DOCUMENT, inject, Service, signal } from '@angular/core';
 
 const STORAGE_KEY = 'macarrones.sonido';
 
-export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop';
+export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers';
 
 /**
  * Tiny synthesised sound effects (Web Audio, no files to download).
@@ -17,6 +17,12 @@ export class SfxService {
 
   private readonly _muted = signal(readMuted());
   readonly muted = this._muted.asReadonly();
+
+  constructor() {
+    // Sounds can also come from other players (e.g. "time to drink"): unlock
+    // the audio on the first tap anywhere, since browsers need a gesture.
+    this.window?.document.addEventListener('pointerdown', () => this.audio(), { once: true, capture: true });
+  }
 
   toggleMuted(): void {
     const muted = !this._muted();
@@ -50,6 +56,11 @@ export class SfxService {
         break;
       case 'pop':
         this.tone(ctx, 'sine', 700, 1300, t, 0.09, 0.14);
+        break;
+      case 'cheers':
+        // Little fanfare, then "glug, glug, glug".
+        [523, 659, 784, 1047].forEach((f, i) => this.tone(ctx, 'square', f, f, t + i * 0.11, i === 3 ? 0.35 : 0.1, 0.08));
+        [0, 1, 2, 3].forEach((i) => this.tone(ctx, 'sine', 320 - i * 25, 110, t + 0.75 + i * 0.26, 0.16, 0.3));
         break;
     }
   }

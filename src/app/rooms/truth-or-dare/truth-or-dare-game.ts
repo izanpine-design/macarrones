@@ -4,6 +4,7 @@ import { QuestionType } from '../../core/question.model';
 import { RoomInfo, Turn } from '../../core/room.model';
 import { roomErrorMessage, RoomService } from '../../core/room.service';
 import { TurnService } from '../../core/turn.service';
+import { DrinkReason, DrinkService } from '../../shared/drink/drink.service';
 import { Roulette } from '../roulette';
 import { QuestionPicker } from './question-picker';
 
@@ -95,6 +96,15 @@ type RouletteStep = 'starter' | 'target' | 'done';
                       {{ askerName() }} pasará al siguiente turno cuando {{ isTarget() ? 'hayas' : 'haya' }} cumplido.
                     </p>
                   }
+                  @if (isTarget()) {
+                    <button type="button" class="btn btn-outline-danger w-100 mt-3" [disabled]="busy()" (click)="drink('rajado')">
+                      <span aria-hidden="true">🐔</span> Me rajo: bebo
+                    </button>
+                  } @else if (isAsker()) {
+                    <button type="button" class="btn btn-outline-danger w-100 mt-2" [disabled]="busy()" (click)="drink('no_cumple')">
+                      <span aria-hidden="true">🍺</span> No lo ha cumplido: ¡a beber!
+                    </button>
+                  }
                 </div>
               }
             }
@@ -124,6 +134,7 @@ type RouletteStep = 'starter' | 'target' | 'done';
 export class TruthOrDareGame {
   private readonly rooms = inject(RoomService);
   private readonly turns = inject(TurnService);
+  private readonly drinks = inject(DrinkService);
   private readonly userId = inject(AuthService).userId;
 
   readonly room = input.required<RoomInfo>();
@@ -163,6 +174,15 @@ export class TruthOrDareGame {
 
   protected nextTurn(): Promise<void> {
     return this.run(() => this.turns.nextTurn(this.room().id));
+  }
+
+  /** Tells the whole room that the target of the turn drinks. */
+  protected drink(reason: DrinkReason): Promise<void> {
+    const turn = this.turn();
+    const apodo = (id: string | null): string => turn.jugadores.find((p) => p.user_id === id)?.apodo ?? 'Alguien';
+    return this.run(() =>
+      this.drinks.send({ userId: turn.objetivo_id, apodo: apodo(turn.objetivo_id), reason, por: apodo(this.userId()) }),
+    );
   }
 
   protected endGame(): Promise<void> {

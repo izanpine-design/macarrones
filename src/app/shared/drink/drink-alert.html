@@ -1,0 +1,44 @@
+<dialog
+  #dialog
+  class="drink"
+  aria-labelledby="drink-title"
+  aria-describedby="drink-reason"
+  [style.--drink-accent]="accent()"
+  (click)="close()"
+  (close)="closed()"
+>
+  @if (call(); as c) {
+    <div class="drink__rays" aria-hidden="true"></div>
+    <div class="drink__confetti" aria-hidden="true">
+      @for (bit of confetti; track $index) {
+        <span
+          [style.left.%]="bit.left"
+          [style.animation-delay.s]="bit.delay"
+          [style.animation-duration.s]="bit.duration"
+          >{{ bit.icon }}</span
+        >
+      }
+    </div>
+
+    <section class="drink__card" (click)="$event.stopPropagation()">
+      <p class="drink__eyebrow"><span aria-hidden="true">🍻</span> Brindis obligatorio</p>
+      <h2 id="drink-title" class="drink__title">¡A beber, {{ name() }}!</h2>
+
+      <div class="drink__photo">
+        <img ngSrc="beber/cuerpo.webp" width="380" height="387" alt="" />
+        <app-crew-head class="drink__head" [crew]="crew()" [nickname]="c.apodo" />
+        @if (pet(); as p) {
+          <div class="drink__pet" aria-hidden="true">
+            <app-pixel-sprite class="drink__pet-sprite" [frame]="p.art.frames.wag" [palette]="p.art.palette" />
+            <app-pixel-sprite class="drink__mug" [frame]="mug" [palette]="mugPalette" />
+          </div>
+        } @else {
+          <app-pixel-sprite class="drink__mug drink__mug--alone" [frame]="mug" [palette]="mugPalette" aria-hidden="true" />
+        }
+      </div>
+
+      <p id="drink-reason" class="drink__reason">{{ reason() }}</p>
+      <button type="button" class="drink__ok" autofocus (click)="close()">¡Salud! <span aria-hidden="true">🍻</span></button>
+    </section>
+  }
+</dialog>

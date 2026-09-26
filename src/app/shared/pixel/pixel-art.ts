@@ -147,6 +147,24 @@ export const PARACHUTE: PixelFrame = [
   mirror('........ss'),
 ];
 
+/** Beer mug for the drinking alert. w foam · y beer · h highlight · b bubble. */
+export const BEER_MUG: PixelFrame = [
+  '...wwwwwww....',
+  '..wwwwwwwwww..',
+  '.wwwwwwwwwwww.',
+  '.kwwwwwwwwwk..',
+  '.kyyyhyyyyyk..',
+  '.kyyyhyyyyykkk',
+  '.kyyyhyybyyk.k',
+  '.kyyyhyyyyyk.k',
+  '.kyyyhybyyykkk',
+  '.kyyyyyyyyyk..',
+  '.kyyybyyyyyk..',
+  '.kkkkkkkkkkk..',
+];
+
+export const BEER_PALETTE: PixelPalette = { k: '#3b2418', w: '#fffaf0', y: '#f5b82e', h: '#ffe7a0', b: '#fff3c4' };
+
 /* ---------- Frame builders ---------- */
 
 function patch(base: PixelFrame, rows: Record<number, string>): PixelFrame {
