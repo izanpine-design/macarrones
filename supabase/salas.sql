@@ -1,5 +1,5 @@
 -- Rooms (salas) and games (turnos). Run manually in the Supabase SQL Editor,
--- AFTER schema.sql.
+-- AFTErrrrR schema.sql.
 --
 -- It only drops and recreates the room/game objects: juegos, niveles and
 -- preguntas are not touched, so imported questions are kept. Existing rooms
