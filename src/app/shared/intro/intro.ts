@@ -1,4 +1,4 @@
-import { afterNextRender, Component, DestroyRef, DOCUMENT, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { CREW, OBJECT_EMOJI } from '../crew/crew';
 import { PetService } from '../pets/pet.service';
 import { PETS } from '../pets/pets';
@@ -7,6 +7,7 @@ import { PixelSprite } from '../pixel/pixel-sprite';
 import { RocketShip } from '../rockets/rocket-ship';
 import { SfxService } from '../sfx/sfx.service';
 import { PastaPlanet } from '../space/pasta-planet';
+import { IntroService } from './intro.service';
 import { Warpfield } from './warpfield';
 
 type Stage = 'ready' | 'countdown' | 'launch' | 'warp' | 'arrive' | 'leaving';
@@ -18,7 +19,8 @@ const STAR_SPEED: Record<Stage, number> = { ready: 0.6, countdown: 0.8, launch: 
 /**
  * Opening show, once per session on the welcome page: countdown, the crew
  * taking off in formation, jump to hyperspace past the pasta planets (the pets
- * bail out in parachutes) and arrival at "Macarrones". Skippable.
+ * bail out in parachutes) and arrival at "Macarrones". Skippable, and it can
+ * be replayed from the welcome page (IntroService).
  */
 @Component({
   selector: 'app-intro',
@@ -52,15 +54,27 @@ export class Intro {
     const destroyRef = inject(DestroyRef);
     destroyRef.onDestroy(() => this.stop());
     afterNextRender(() => {
-      if (!this.shouldShow()) return;
-      this.visible.set(true);
-      this.document.body.style.overflow = 'hidden';
-      // The dialog is rendered in the next tick.
-      this.later(0, () => {
-        const canvas = this.canvas()?.nativeElement;
-        if (canvas) this.warpfield = new Warpfield(canvas, () => STAR_SPEED[this.stage()]);
-        this.launchButton()?.nativeElement.focus();
-      });
+      if (this.shouldShow()) this.open();
+    });
+    // "Ver presentación" on the welcome page: the user asked for it, so it
+    // plays even with reduced motion or if it was already seen.
+    const requests = inject(IntroService).requests;
+    effect(() => {
+      if (requests() > 0) untracked(() => this.open());
+    });
+  }
+
+  private open(): void {
+    if (this.visible()) return;
+    this.stage.set('ready');
+    this.count.set(3);
+    this.visible.set(true);
+    this.document.body.style.overflow = 'hidden';
+    // The dialog is rendered in the next tick.
+    this.later(0, () => {
+      const canvas = this.canvas()?.nativeElement;
+      if (canvas) this.warpfield = new Warpfield(canvas, () => STAR_SPEED[this.stage()]);
+      this.launchButton()?.nativeElement.focus();
     });
   }
 

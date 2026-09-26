@@ -44,8 +44,11 @@
     </div>
   </div>
 
-  <button type="button" class="sound-toggle" [attr.aria-pressed]="!sfx.muted()" (click)="sfx.toggleMuted()">
-    <span aria-hidden="true">{{ sfx.muted() ? '🔇' : '🔊' }}</span> Sonido
-  </button>
+  <div class="hero-tools">
+    <button type="button" (click)="intro.replay()"><span aria-hidden="true">🎬</span> Ver presentación</button>
+    <button type="button" class="sound-toggle" [attr.aria-pressed]="!sfx.muted()" (click)="sfx.toggleMuted()">
+      <span aria-hidden="true">{{ sfx.muted() ? '🔇' : '🔊' }}</span> Sonido
+    </button>
+  </div>
   <p class="welcome-hero__hint" aria-hidden="true">¡Toca un cohete!</p>
 </section>

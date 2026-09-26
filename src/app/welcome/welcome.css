@@ -163,11 +163,18 @@
   outline-offset: 4px;
 }
 
-.sound-toggle {
+.hero-tools {
   position: absolute;
   z-index: 3;
   top: .8rem;
   right: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .5rem;
+}
+
+.hero-tools button {
   display: inline-flex;
   min-height: 40px;
   align-items: center;
@@ -183,8 +190,8 @@
 }
 
 .sound-toggle[aria-pressed='false'] { color: #d9cdb8; }
-.sound-toggle:hover { background: rgb(255 240 207 / 14%); }
-.sound-toggle:focus-visible { outline: 3px solid #ffcf75; outline-offset: 3px; }
+.hero-tools button:hover { background: rgb(255 240 207 / 14%); }
+.hero-tools button:focus-visible { outline: 3px solid #ffcf75; outline-offset: 3px; }
 
 .welcome-hero__hint {
   position: absolute;

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { form, FormField, maxLength, submit, validate } from '@angular/forms/signals';
 import { PlayerService } from '../core/player.service';
 import { RocketSky } from '../shared/rockets/rocket-sky';
+import { IntroService } from '../shared/intro/intro.service';
 import { SfxService } from '../shared/sfx/sfx.service';
 import { SpaceSky } from '../shared/space/space-sky';
 
@@ -23,6 +24,7 @@ export class Welcome {
   readonly volver = input<string>();
 
   protected readonly sfx = inject(SfxService);
+  protected readonly intro = inject(IntroService);
   protected readonly minLength = NICKNAME_MIN_LENGTH;
   protected readonly maxLength = NICKNAME_MAX_LENGTH;
 
