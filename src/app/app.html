@@ -1,15 +1,15 @@
-<header class="navbar bg-primary mb-4">
+<header class="navbar site-nav">
   <div class="container">
-    <h1 class="navbar-brand text-white fw-bold m-0">Macarrones</h1>
+    <a class="navbar-brand site-nav__brand" routerLink="/">Macarrones</a>
     @if (player.hasNickname()) {
-      <div class="d-flex align-items-center gap-2 text-white">
+      <div class="d-flex align-items-center gap-2 site-nav__player">
         <span>{{ player.nickname() }}</span>
-        <a routerLink="/" class="btn btn-sm btn-light">Cambiar apodo</a>
+        <a routerLink="/" class="btn btn-sm site-nav__button">Cambiar apodo</a>
       </div>
     }
   </div>
 </header>
 
-<main class="container pb-4">
+<main class="container pb-4 site-main">
   <router-outlet />
 </main>

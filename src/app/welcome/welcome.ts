@@ -9,48 +9,8 @@ export const NICKNAME_MAX_LENGTH = 20;
 @Component({
   selector: 'app-welcome',
   imports: [FormField],
-  template: `
-    <div class="row justify-content-center">
-      <div class="col-12 col-sm-10 col-md-7 col-lg-5">
-        <div class="card shadow-sm">
-          <div class="card-body p-4">
-            <h2 class="h3 card-title">¡Bienvenido!</h2>
-            <p class="text-body-secondary">
-              Elige el apodo con el que te verán los demás jugadores.
-            </p>
-
-            <form novalidate (submit)="save($event)">
-              <div class="mb-3">
-                <label for="nickname" class="form-label">Apodo</label>
-                <input
-                  id="nickname"
-                  type="text"
-                  class="form-control form-control-lg"
-                  autocomplete="nickname"
-                  aria-required="true"
-                  [formField]="nicknameForm.nickname"
-                  [class.is-invalid]="showErrors()"
-                  [attr.aria-invalid]="showErrors()"
-                  [attr.aria-describedby]="showErrors() ? 'nickname-error' : 'nickname-help'"
-                />
-                @if (showErrors()) {
-                  <div id="nickname-error" class="invalid-feedback">
-                    {{ nicknameForm.nickname().errors()[0].message }}
-                  </div>
-                } @else {
-                  <div id="nickname-help" class="form-text">
-                    Entre {{ minLength }} y {{ maxLength }} caracteres.
-                  </div>
-                }
-              </div>
-
-              <button type="submit" class="btn btn-primary btn-lg w-100">Entrar</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './welcome.html',
+  styleUrl: './welcome.css',
 })
 export class Welcome {
   private readonly player = inject(PlayerService);
@@ -59,6 +19,8 @@ export class Welcome {
   /** Query param `?volver=` set by nicknameGuard (e.g. an invite link). */
   readonly volver = input<string>();
 
+  /** Fixed decorative slots ready for future portrait images. */
+  protected readonly rocketSlots = [0, 1, 2, 3, 4];
   protected readonly minLength = NICKNAME_MIN_LENGTH;
   protected readonly maxLength = NICKNAME_MAX_LENGTH;
 

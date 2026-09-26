@@ -1,1 +1,51 @@
-/* You can add global styles to this file, and also import other style files */
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  background: #fffaf0;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: #fffaf0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.site-nav {
+  min-height: 68px;
+  border-bottom: 1px solid rgb(255 237 205 / 14%);
+  background: #201b36;
+}
+
+.site-nav__brand {
+  color: #fff2cc;
+  font-family: 'Jokerman', 'Comic Sans MS', cursive;
+  font-size: 1.65rem;
+  text-decoration: none;
+}
+
+.site-nav__brand:hover,
+.site-nav__brand:focus-visible { color: #ffcf75; }
+
+.site-nav__player { color: #fff8e9; }
+
+.site-nav__button {
+  border-color: #ffcf75;
+  color: #312539;
+  background: #ffcf75;
+  font-weight: 700;
+}
+
+.site-nav__button:hover,
+.site-nav__button:focus-visible {
+  border-color: #ffdf99;
+  color: #312539;
+  background: #ffdf99;
+}
+
+.site-main:has(app-welcome) {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 !important;
+}

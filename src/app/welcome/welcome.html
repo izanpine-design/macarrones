@@ -1,0 +1,72 @@
+<section class="welcome-hero" aria-labelledby="welcome-title">
+  <div class="welcome-hero__stars" aria-hidden="true"></div>
+
+  <div class="flight-lane" aria-hidden="true">
+    @for (slot of rocketSlots; track slot) {
+      <div [class]="'rocket rocket--' + slot">
+        <!-- Keep the portrait space identical for every macaroni; replace FOTO with an image later. -->
+        <div class="rocket__pilot-slot"><span>FOTO</span></div>
+        <svg class="rocket__body" viewBox="0 0 180 110" role="presentation" focusable="false">
+          <defs>
+            <linearGradient [attr.id]="'macaroni-pasta-' + slot" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffe0a0" />
+              <stop offset=".55" stop-color="#f2bf70" />
+              <stop offset="1" stop-color="#d99250" />
+            </linearGradient>
+          </defs>
+          <path d="M23 96V63C23 41 41 23 63 23H157" fill="none" stroke="#9c4c34" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M23 96V63C23 41 41 23 63 23H157" fill="none" [attr.stroke]="'url(#macaroni-pasta-' + slot + ')'" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M10 77H36M85 7V39M111 7V39M137 7V39" fill="none" stroke="#b56f42" stroke-width="2.5" stroke-linecap="round" opacity=".62" />
+          <ellipse cx="157" cy="23" rx="9" ry="15" fill="#b76c45" />
+          <ellipse cx="159" cy="23" rx="4.5" ry="9" fill="#704537" />
+          <ellipse cx="23" cy="96" rx="15" ry="9" fill="#b76c45" />
+          <ellipse cx="23" cy="98" rx="9" ry="4.5" fill="#704537" />
+        </svg>
+        <div class="rocket__flame"></div>
+      </div>
+    }
+  </div>
+
+  <div class="welcome-hero__orbit welcome-hero__orbit--one" aria-hidden="true"></div>
+  <div class="welcome-hero__orbit welcome-hero__orbit--two" aria-hidden="true"></div>
+
+  <div class="welcome-content">
+    <p class="welcome-content__eyebrow">Una aventura recién salida del horno</p>
+    <h1 id="welcome-title">Macarrones</h1>
+    <p class="welcome-content__intro">Preparaos para despegar. El siguiente cohete puede ser cualquiera de nosotros.</p>
+
+    <div class="nickname-card">
+      <h2>¡Bienvenido!</h2>
+      <p>Elige el apodo con el que te verán los demás jugadores.</p>
+
+      <form novalidate (submit)="save($event)">
+        <div class="nickname-card__field">
+          <label for="nickname">Apodo</label>
+          <input
+            id="nickname"
+            type="text"
+            autocomplete="nickname"
+            aria-required="true"
+            [formField]="nicknameForm.nickname"
+            [class.is-invalid]="showErrors()"
+            [attr.aria-invalid]="showErrors()"
+            [attr.aria-describedby]="showErrors() ? 'nickname-error' : 'nickname-help'"
+          />
+          @if (showErrors()) {
+            <span id="nickname-error" class="nickname-card__error">
+              {{ nicknameForm.nickname().errors()[0].message }}
+            </span>
+          } @else {
+            <span id="nickname-help" class="nickname-card__help">
+              Entre {{ minLength }} y {{ maxLength }} caracteres.
+            </span>
+          }
+        </div>
+
+        <button type="submit">Entrar <span aria-hidden="true">→</span></button>
+      </form>
+    </div>
+  </div>
+
+  <p class="welcome-hero__hint" aria-hidden="true">¡Pasta a la vista!</p>
+</section>
