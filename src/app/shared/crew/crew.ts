@@ -61,7 +61,7 @@ export const CREW: readonly CrewMember[] = [
     color: '#f08a24',
     colorOscuro: '#a1520c',
     pelo: '#2e2019',
-    cabeza: null,
+    cabeza: 'crew/miguel.webp',
     delante: null,
     detras: null,
     mascota: 'enana',

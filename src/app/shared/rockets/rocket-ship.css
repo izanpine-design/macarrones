@@ -59,6 +59,9 @@
   animation: nod 1.4s ease-in-out infinite alternate;
 }
 
+/* Real photos read better a bit big, bobblehead style. */
+.ship__head--photo { scale: 1.22; }
+
 .ship__puffs circle {
   transform-origin: 150px 50px;
   opacity: 0;
