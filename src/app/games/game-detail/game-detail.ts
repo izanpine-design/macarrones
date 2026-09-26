@@ -10,8 +10,8 @@ import { OpenRoomList } from '../../rooms/open-room-list';
   selector: 'app-game-detail',
   imports: [RouterLink, CreateRoomForm, JoinByCodeForm, OpenRoomList],
   template: `
-    <nav class="mb-3" aria-label="Navegación">
-      <a routerLink="/juegos" class="link-primary">← Volver a los juegos</a>
+    <nav class="page-crumb" aria-label="Navegación">
+      <a routerLink="/juegos" class="pasta-link">← Volver al menú de la tripulación</a>
     </nav>
 
     @if (loading()) {
@@ -22,7 +22,11 @@ import { OpenRoomList } from '../../rooms/open-room-list';
     } @else if (error()) {
       <div class="alert alert-danger" role="alert">No se ha podido cargar el juego: {{ error() }}</div>
     } @else if (game(); as game) {
-      <h2 class="h3 mb-3">{{ game.nombre }}</h2>
+      <section class="page-intro page-intro--compact" aria-labelledby="game-title">
+        <p class="page-intro__eyebrow">A preparar el viaje</p>
+        <h1 id="game-title" class="page-title">{{ game.nombre }}</h1>
+        <p class="page-intro__copy">Cread una sala o uníos con vuestro código para empezar a jugar.</p>
+      </section>
 
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">

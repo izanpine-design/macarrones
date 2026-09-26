@@ -6,7 +6,11 @@ import { GameService, GameSummary } from '../../core/game.service';
   selector: 'app-game-list',
   imports: [RouterLink],
   template: `
-    <h2 class="h4 mb-3">Elige un juego</h2>
+    <section class="page-intro" aria-labelledby="games-title">
+      <p class="page-intro__eyebrow">El menú de la tripulación</p>
+      <h1 id="games-title" class="page-title">Elige un juego</h1>
+      <p class="page-intro__copy">Reúne a la pandilla, prepara la pasta y elegid vuestra próxima aventura.</p>
+    </section>
 
     @if (loading()) {
       <div class="d-flex align-items-center gap-2" role="status">
