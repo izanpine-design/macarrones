@@ -6,6 +6,8 @@ begin;
 
 -- Reset -------------------------------------------------------------------------
 
+-- Rooms depend on juegos: they are dropped too, run salas.sql again afterwards.
+drop table if exists public.jugadores_sala, public.salas_privado, public.salas cascade;
 drop table if exists public.preguntas cascade;
 drop table if exists public.juegos    cascade;
 drop table if exists public.niveles   cascade;

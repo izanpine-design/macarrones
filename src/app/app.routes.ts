@@ -23,5 +23,11 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'sala/:codigo',
+    canActivate: [nicknameGuard],
+    title: 'Sala · Macarrones',
+    loadComponent: () => import('./rooms/room-page').then((m) => m.RoomPage),
+  },
   { path: '**', redirectTo: '' },
 ];

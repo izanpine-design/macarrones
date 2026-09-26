@@ -2,10 +2,13 @@ import { Component, effect, inject, input, numberAttribute, signal } from '@angu
 import { RouterLink } from '@angular/router';
 import { Game } from '../../core/question.model';
 import { GameService } from '../../core/game.service';
+import { CreateRoomForm } from '../../rooms/create-room-form';
+import { JoinByCodeForm } from '../../rooms/join-by-code-form';
+import { OpenRoomList } from '../../rooms/open-room-list';
 
 @Component({
   selector: 'app-game-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, CreateRoomForm, JoinByCodeForm, OpenRoomList],
   template: `
     <nav class="mb-3" aria-label="Navegación">
       <a routerLink="/juegos" class="link-primary">← Volver a los juegos</a>
@@ -19,8 +22,28 @@ import { GameService } from '../../core/game.service';
     } @else if (error()) {
       <div class="alert alert-danger" role="alert">No se ha podido cargar el juego: {{ error() }}</div>
     } @else if (game(); as game) {
-      <h2 class="h3">{{ game.nombre }}</h2>
-      <p class="text-body-secondary">Aquí podrás crear una sala o unirte a una. Próximamente.</p>
+      <h2 class="h3 mb-3">{{ game.nombre }}</h2>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+          <section class="card h-100 shadow-sm" aria-labelledby="create-room-title">
+            <div class="card-body">
+              <h3 id="create-room-title" class="h5 card-title">Crear sala</h3>
+              <app-create-room-form [gameId]="game.id" />
+            </div>
+          </section>
+        </div>
+        <div class="col-12 col-md-6">
+          <section class="card h-100 shadow-sm" aria-labelledby="join-room-title">
+            <div class="card-body">
+              <h3 id="join-room-title" class="h5 card-title">Unirse con código</h3>
+              <app-join-by-code-form />
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <app-open-room-list [gameId]="game.id" />
     } @else {
       <div class="alert alert-warning" role="alert">Este juego no existe.</div>
     }

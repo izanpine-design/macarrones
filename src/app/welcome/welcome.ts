@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { form, FormField, maxLength, submit, validate } from '@angular/forms/signals';
 import { PlayerService } from '../core/player.service';
@@ -56,6 +56,9 @@ export class Welcome {
   private readonly player = inject(PlayerService);
   private readonly router = inject(Router);
 
+  /** Query param `?volver=` set by nicknameGuard (e.g. an invite link). */
+  readonly volver = input<string>();
+
   protected readonly minLength = NICKNAME_MIN_LENGTH;
   protected readonly maxLength = NICKNAME_MAX_LENGTH;
 
@@ -85,8 +88,13 @@ export class Welcome {
     event.preventDefault();
     void submit(this.nicknameForm, async () => {
       this.player.setNickname(this.model().nickname);
-      await this.router.navigateByUrl('/juegos');
+      await this.router.navigateByUrl(safeReturnUrl(this.volver()));
       return undefined;
     });
   }
+}
+
+/** Only same-app paths, to avoid redirecting to another site. */
+function safeReturnUrl(url: string | undefined): string {
+  return url?.startsWith('/') && !url.startsWith('//') ? url : '/juegos';
 }
