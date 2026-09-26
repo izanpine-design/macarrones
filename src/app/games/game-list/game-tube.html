@@ -1,0 +1,85 @@
+@let g = game();
+<article class="card" [class.card--soon]="!playable()" [attr.data-game]="g.clave">
+  <div class="art" aria-hidden="true">
+    <span class="art__planet"></span>
+    <span class="art__orbit"></span>
+
+    <svg class="art__penne" viewBox="0 0 120 120" focusable="false">
+      <defs>
+        <!-- Cylinder shading across the tube: light on top, darker underneath -->
+        <linearGradient [attr.id]="ids.body" gradientUnits="userSpaceOnUse" x1="48.18" y1="47.87" x2="65.82" y2="72.13">
+          <stop offset="0" stop-color="#fff0c4" />
+          <stop offset=".3" stop-color="#f7cf7e" />
+          <stop offset=".75" stop-color="#e5a152" />
+          <stop offset="1" stop-color="#bf7736" />
+        </linearGradient>
+        <linearGradient [attr.id]="ids.raw" gradientUnits="userSpaceOnUse" x1="48.18" y1="47.87" x2="65.82" y2="72.13">
+          <stop offset="0" stop-color="#fff6de" />
+          <stop offset=".35" stop-color="#f1dca8" />
+          <stop offset=".8" stop-color="#dcbc80" />
+          <stop offset="1" stop-color="#bf9a5c" />
+        </linearGradient>
+        <radialGradient [attr.id]="ids.hole" cx=".45" cy=".45" r=".6">
+          <stop offset="0" stop-color="#2b1a14" />
+          <stop offset="1" stop-color="#6b3f24" />
+        </radialGradient>
+      </defs>
+
+      <ellipse class="art__shadow" cx="60" cy="110" rx="38" ry="5" />
+
+      <!-- Penne rigate: tube with diagonal cuts, ridges and shine -->
+      <path
+        d="M21.65 67.16L87.65 19.16A17.00 6.5 -97.9 0 1 92.35 52.84L26.35 100.84A17.00 6.5 -97.9 0 1 21.65 67.16Z"
+        [attr.fill]="'url(#' + (playable() ? ids.body : ids.raw) + ')'"
+        stroke="#a8652f"
+        stroke-opacity=".45"
+      />
+      <g stroke="#8f5226" stroke-opacity=".3" stroke-width="1.4" stroke-linecap="round">
+        <line x1="27.01" y1="69.44" x2="78.46" y2="32.03" />
+        <line x1="29.96" y1="73.49" x2="81.4" y2="36.07" />
+        <line x1="32.9" y1="77.53" x2="84.34" y2="40.12" />
+        <line x1="35.84" y1="81.57" x2="87.28" y2="44.16" />
+        <line x1="38.78" y1="85.62" x2="90.22" y2="48.2" />
+      </g>
+      <line x1="29.22" y1="69.08" x2="76.62" y2="34.6" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round" />
+
+      <!-- Open end, where the game's thing comes out -->
+      <ellipse cx="90" cy="36" rx="17.00" ry="6.5" transform="rotate(-97.9 90 36)" [attr.fill]="playable() ? '#f8d48d' : '#f3e2b8'" stroke="#a8652f" stroke-opacity=".5" />
+      <ellipse cx="90.6" cy="36.3" rx="13.20" ry="4.1" transform="rotate(-97.9 90.6 36.3)" [attr.fill]="'url(#' + ids.hole + ')'" />
+
+      @if (playable()) {
+        <!-- Tomato sauce and a basil leaf -->
+        <path d="M36 60Q46 46 62 37Q72 32 74 39Q68 45 64 50Q62 59 58 52Q53 58 49 54Q45 62 42 57Q38 62 36 60Z" fill="#d4321f" />
+        <path d="M45 52Q53 44 63 39" fill="none" stroke="#ff9480" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M60 40Q64 30 75 30Q72 40 60 40Z" fill="#3fae4f" stroke="#1f6b2a" stroke-width="1.2" />
+      }
+    </svg>
+
+    <span class="art__peek"></span>
+    @if (playable()) {
+      <span class="art__steam"><i></i><i></i><i></i></span>
+    }
+  </div>
+
+  <div class="card__text">
+    @if (theme(); as t) {
+      <p class="card__planet">{{ t.planeta }}</p>
+    }
+    <h3 class="card__title">
+      <a class="card__link" [routerLink]="['/juegos', g.id]">{{ g.nombre }}</a>
+    </h3>
+    @if (g.descripcion) {
+      <p class="card__desc">{{ g.descripcion }}</p>
+    }
+    <p class="card__meta">
+      @if (playable()) {
+        <span class="card__play"><span aria-hidden="true">▶</span> Jugar</span>
+      } @else {
+        <span class="card__soon">Próximamente</span>
+      }
+      @if (g.questionCount > 0) {
+        <span>{{ g.questionCount }} {{ g.questionCount === 1 ? 'pregunta' : 'preguntas' }}</span>
+      }
+    </p>
+  </div>
+</article>
