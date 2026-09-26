@@ -16,3 +16,7 @@
 
 <app-game-backdrop />
 <app-pet-layer />
+<!-- Opening show: its own chunk, loaded right after the first render. -->
+@defer (on immediate) {
+  <app-intro />
+}

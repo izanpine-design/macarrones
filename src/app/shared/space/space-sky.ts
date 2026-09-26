@@ -1,4 +1,5 @@
 import { afterNextRender, Component, DestroyRef, DOCUMENT, ElementRef, inject } from '@angular/core';
+import { PastaPlanet } from './pasta-planet';
 
 interface Star {
   /** Position as a fraction of the sky. */
@@ -31,6 +32,7 @@ const METEOR_LIFE = 0.9;
  */
 @Component({
   selector: 'app-space-sky',
+  imports: [PastaPlanet],
   templateUrl: './space-sky.html',
   styleUrl: './space-sky.css',
   host: { 'aria-hidden': 'true' },

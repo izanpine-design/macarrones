@@ -129,6 +129,20 @@
         <circle class="ship__led" cx="203" cy="61" r="2" fill="#eaffff" />
         <circle cx="199" cy="62" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
       }
+      @case ('mando') {
+        <path d="M172 82Q200 80 199 64" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
+        <g transform="rotate(-14 206 56)">
+          <path d="M190 51Q190 44 197 44H215Q222 44 222 51L225 61Q226 67 220 67Q217 67 214 63H198Q195 67 192 67Q186 67 187 61Z" fill="#2f2a3a" stroke="#14111a" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M193.5 53H200.5M197 49.5V56.5" stroke="#cfc8de" stroke-width="2.2" stroke-linecap="round" />
+          <g class="ship__buttons">
+            <circle cx="213" cy="50.5" r="1.8" fill="#ff5a5a" />
+            <circle cx="216.8" cy="53.8" r="1.8" fill="#5ad1ff" />
+            <circle cx="209.2" cy="53.8" r="1.8" fill="#ffd25a" />
+            <circle cx="213" cy="57.1" r="1.8" fill="#6ee07a" />
+          </g>
+        </g>
+        <circle cx="199" cy="63" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
+      }
       @default {
         <path d="M172 80Q194 76 205 63" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
         <circle cx="206" cy="61" r="8" fill="#fff" stroke="#1d1626" stroke-width="2" />

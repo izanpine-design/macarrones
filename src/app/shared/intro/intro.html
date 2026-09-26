@@ -1,0 +1,55 @@
+@if (visible()) {
+  <div class="intro" [class]="'intro--' + stage()" role="dialog" aria-modal="true" aria-label="Presentación de Macarrones">
+    <canvas #stars class="intro__stars" aria-hidden="true"></canvas>
+
+    <!-- Planets that zoom past in hyperspace -->
+    <div aria-hidden="true">
+      <app-pasta-planet class="intro__planet intro__planet--cheese" kind="cheese" />
+      <app-pasta-planet class="intro__planet intro__planet--tomato" kind="tomato" />
+      <app-pasta-planet class="intro__planet intro__planet--meatball" kind="meatball" />
+    </div>
+
+    <!-- The crew in formation; each pet bails out in hyperspace -->
+    <div class="intro__stage" aria-hidden="true">
+      @for (c of crew; track c.member.id; let i = $index) {
+        <div class="intro__pilot" [class]="'intro__pilot--' + i">
+          <app-rocket-ship class="intro__ship" [crew]="c.member" [uid]="c.uid" />
+          <span class="intro__label" [style.--label]="c.member.color">{{ c.member.nombre }} {{ c.label }}</span>
+          <div class="intro__bailout">
+            <app-pixel-sprite class="intro__chute" [frame]="parachute" [palette]="c.pet.chutePalette" />
+            <app-pixel-sprite class="intro__pet" [frame]="c.pet.art.frames.stand" [palette]="c.pet.art.palette" />
+          </div>
+        </div>
+      }
+    </div>
+
+    @switch (stage()) {
+      @case ('ready') {
+        <div class="intro__panel">
+          <p class="intro__eyebrow">Tripulación lista para despegar</p>
+          <button #launchButton type="button" class="intro__launch" (click)="launch()">
+            <span aria-hidden="true">🚀</span> ¡Despegar!
+          </button>
+          <p class="intro__hint">Sube el volumen <span aria-hidden="true">🔊</span></p>
+        </div>
+      }
+      @case ('countdown') {
+        @for (n of [count()]; track n) {
+          <p class="intro__count">{{ n }}</p>
+        }
+      }
+      @case ('launch') {
+        <p class="intro__count intro__count--go">¡Despegue!</p>
+      }
+      @case ('warp') {}
+      @default {
+        <div class="intro__title">
+          <p class="intro__eyebrow">Una aventura recién salida del horno</p>
+          <p class="intro__logo">Macarrones</p>
+        </div>
+      }
+    }
+
+    <button type="button" class="intro__skip" (click)="skip()">Saltar intro <span aria-hidden="true">›</span></button>
+  </div>
+}

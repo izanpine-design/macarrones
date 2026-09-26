@@ -2,7 +2,7 @@ import { DOCUMENT, inject, Service, signal } from '@angular/core';
 
 const STORAGE_KEY = 'macarrones.sonido';
 
-export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers';
+export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers' | 'beep' | 'go' | 'launch' | 'warp' | 'arrive' | 'hiss';
 
 /**
  * Tiny synthesised sound effects (Web Audio, no files to download).
@@ -57,6 +57,27 @@ export class SfxService {
       case 'pop':
         this.tone(ctx, 'sine', 700, 1300, t, 0.09, 0.14);
         break;
+      case 'beep':
+        this.tone(ctx, 'square', 660, 660, t, 0.14, 0.08);
+        break;
+      case 'go':
+        this.tone(ctx, 'square', 990, 990, t, 0.3, 0.08);
+        break;
+      case 'launch':
+        this.noiseBurst(ctx, t, 2.2, 0.45, 900);
+        this.tone(ctx, 'sawtooth', 55, 120, t, 2, 0.12);
+        break;
+      case 'warp':
+        this.noiseBurst(ctx, t, 1.4, 0.3, 300, 6000);
+        this.tone(ctx, 'sine', 200, 1800, t, 1.3, 0.12);
+        break;
+      case 'arrive':
+        [523, 659, 784].forEach((f) => this.tone(ctx, 'triangle', f, f, t, 0.9, 0.09));
+        this.tone(ctx, 'triangle', 1047, 1047, t + 0.12, 0.8, 0.07);
+        break;
+      case 'hiss':
+        this.noiseBurst(ctx, t, 0.45, 0.25, 5000, 2500);
+        break;
       case 'cheers':
         // Little fanfare, then "glug, glug, glug".
         [523, 659, 784, 1047].forEach((f, i) => this.tone(ctx, 'square', f, f, t + i * 0.11, i === 3 ? 0.35 : 0.1, 0.08));
@@ -88,15 +109,16 @@ export class SfxService {
     osc.stop(at + length + 0.02);
   }
 
-  private noiseBurst(ctx: AudioContext, at: number, length: number, volume: number): void {
+  /** Filtered white noise; the filter sweeps from `from` to `to` Hz. */
+  private noiseBurst(ctx: AudioContext, at: number, length: number, volume: number, from = 1800, to = 90): void {
     this.noise ??= whiteNoise(ctx);
     const source = ctx.createBufferSource();
     const filter = ctx.createBiquadFilter();
     const gain = ctx.createGain();
     source.buffer = this.noise;
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(1800, at);
-    filter.frequency.exponentialRampToValueAtTime(90, at + length);
+    filter.frequency.setValueAtTime(from, at);
+    filter.frequency.exponentialRampToValueAtTime(to, at + length);
     gain.gain.setValueAtTime(volume, at);
     gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
     source.connect(filter).connect(gain).connect(ctx.destination);
