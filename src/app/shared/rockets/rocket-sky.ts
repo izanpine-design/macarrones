@@ -12,7 +12,7 @@ const ART_W = 240;
 const ART_H = 150;
 /** Points of the drawing: engine exhaust and the pet's seat. */
 const EXHAUST: Point = { x: 44, y: 92 };
-const PET_SEAT: Point = { x: 80, y: 58 };
+const PET_SEAT: Point = { x: 68, y: 58 };
 /** Chance that a tapped rocket dodges and shows you the finger. */
 const DODGE_CHANCE = 0.1;
 const GRAVITY = 1250;
@@ -191,7 +191,7 @@ export class RocketSky {
 
     const crew = this.nextCrew(new Set(flying.map((f) => f.crew.id)));
     if (!crew) return;
-    const w = small ? 132 : 190;
+    const w = small ? 146 : 214;
     const dir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
     // On phones the nickname card fills the middle: fly over the title instead.
     const path = randomFlightPath(this.width, this.height, w, dir, small ? MOBILE_BAND : [0, 1]);

@@ -34,15 +34,15 @@
 
   <!-- Back arm, behind the tube: waving, or holding the bowling ball up -->
   <g class="ship__arm ship__arm--back" [class.ship__arm--lift]="c.detras">
-    <path d="M128 78Q112 66 112 49" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
+    <path d="M126 79Q104 70 100 50" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
     @if (c.detras === 'bolos') {
-      <circle cx="111" cy="31" r="13" fill="#3a2c86" stroke="#1d1626" stroke-width="2" />
-      <path d="M103 24Q107 20 112 20" fill="none" stroke="#9d8cf2" stroke-width="2.5" stroke-linecap="round" />
-      <circle cx="108" cy="30" r="2" fill="#120d2a" />
-      <circle cx="114" cy="28" r="2" fill="#120d2a" />
-      <circle cx="113" cy="35" r="2" fill="#120d2a" />
+      <circle cx="97" cy="32" r="13" fill="#3a2c86" stroke="#1d1626" stroke-width="2" />
+      <path d="M89 25Q93 21 98 21" fill="none" stroke="#9d8cf2" stroke-width="2.5" stroke-linecap="round" />
+      <circle cx="94" cy="31" r="2" fill="#120d2a" />
+      <circle cx="100" cy="29" r="2" fill="#120d2a" />
+      <circle cx="99" cy="36" r="2" fill="#120d2a" />
     }
-    <circle cx="112" cy="46" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
+    <circle cx="100" cy="47" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
   </g>
 
   <!-- The macaroni: ridged pasta tube -->
@@ -77,55 +77,57 @@
     <path class="ship__scarf" d="M137 64C119 57 104 71 82 61C94 77 116 77 139 72Z" [attr.fill]="c.color" [attr.stroke]="c.colorOscuro" stroke-width="1.5" />
     <ellipse cx="150" cy="66" rx="16" ry="6" [attr.fill]="c.color" [attr.stroke]="c.colorOscuro" stroke-width="2" />
 
-    <g class="ship__head" [class.ship__head--photo]="c.cabeza">
-      @if (c.cabeza; as photo) {
-        <circle cx="150" cy="38" r="23" fill="#f1c29c" />
-        <image [attr.href]="photo" x="126" y="14" width="48" height="48" preserveAspectRatio="xMidYMid slice" [attr.clip-path]="'url(#' + id.head + ')'" />
-      } @else {
-        <circle cx="150" cy="38" r="23" fill="#f1c29c" />
-        <path d="M127 38Q124 13 150 13Q176 13 173 38Q168 26 157 24Q150 30 139 27Q131 30 127 38Z" [attr.fill]="c.pelo" />
-        <circle cx="137" cy="46" r="4" fill="#ff8f8f" fill-opacity=".45" />
-        <circle cx="163" cy="46" r="4" fill="#ff8f8f" fill-opacity=".45" />
-        @if (mode() === 'fall') {
-          <path d="M137 36l7 7M144 36l-7 7M156 36l7 7M163 36l-7 7" stroke="#2b2230" stroke-width="2.5" stroke-linecap="round" />
-          <ellipse cx="150" cy="51" rx="3.5" ry="4.5" fill="#2b2230" />
+    <!-- Bobblehead: the face is the star of the rocket -->
+    <g transform="translate(150 62) scale(1.6) translate(-150 -62)">
+      <g class="ship__head">
+        @if (c.cabeza; as photo) {
+          <circle cx="150" cy="38" r="23" fill="#f1c29c" />
+          <image [attr.href]="photo" x="126" y="14" width="48" height="48" preserveAspectRatio="xMidYMid slice" [attr.clip-path]="'url(#' + id.head + ')'" />
         } @else {
-          <ellipse cx="141" cy="40" rx="3" ry="3.6" fill="#2b2230" />
-          <ellipse cx="159" cy="40" rx="3" ry="3.6" fill="#2b2230" />
-          <circle cx="142" cy="39" r="1" fill="#fff" />
-          <circle cx="160" cy="39" r="1" fill="#fff" />
-          <path d="M143 48Q150 55 157 48" fill="none" stroke="#2b2230" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="150" cy="38" r="23" fill="#f1c29c" />
+          <path d="M127 38Q124 13 150 13Q176 13 173 38Q168 26 157 24Q150 30 139 27Q131 30 127 38Z" [attr.fill]="c.pelo" />
+          <circle cx="137" cy="46" r="4" fill="#ff8f8f" fill-opacity=".45" />
+          <circle cx="163" cy="46" r="4" fill="#ff8f8f" fill-opacity=".45" />
+          @if (mode() === 'fall') {
+            <path d="M137 36l7 7M144 36l-7 7M156 36l7 7M163 36l-7 7" stroke="#2b2230" stroke-width="2.5" stroke-linecap="round" />
+            <ellipse cx="150" cy="51" rx="3.5" ry="4.5" fill="#2b2230" />
+          } @else {
+            <ellipse cx="141" cy="40" rx="3" ry="3.6" fill="#2b2230" />
+            <ellipse cx="159" cy="40" rx="3" ry="3.6" fill="#2b2230" />
+            <circle cx="142" cy="39" r="1" fill="#fff" />
+            <circle cx="160" cy="39" r="1" fill="#fff" />
+            <path d="M143 48Q150 55 157 48" fill="none" stroke="#2b2230" stroke-width="2.5" stroke-linecap="round" />
+          }
         }
-      }
-      <circle cx="150" cy="38" r="23" fill="none" stroke="#1d1626" stroke-width="2.5" />
-    </g>
-
-    @if (mode() === 'fall') {
-      <g class="ship__dizzy" fill="#ffe27a" stroke="#1d1626" stroke-width="1">
-        <path d="M130 12l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z" />
-        <path d="M168 8l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z" />
-        <path d="M150 2l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z" />
+        <circle cx="150" cy="38" r="23" fill="none" stroke="#1d1626" stroke-width="2" />
+        @if (mode() === 'fall') {
+          <g class="ship__dizzy" fill="#ffe27a" stroke="#1d1626" stroke-width=".8">
+            <path d="M130 8l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z" />
+            <path d="M168 4l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z" />
+            <path d="M150 -2l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z" />
+          </g>
+        }
       </g>
-    }
+    </g>
   </g>
 
   <!-- Front arm, in front of everything: their thing near the mouth -->
   <g class="ship__arm ship__arm--front">
     @switch (c.delante) {
       @case ('micro') {
-        <path d="M172 80Q190 72 178 58" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
-        <path d="M178 60L168 49" stroke="#26262e" stroke-width="5" stroke-linecap="round" />
-        <circle cx="165" cy="45" r="7" fill="#cfd3dc" stroke="#555a68" stroke-width="2" />
-        <path d="M160 43h10M161 47h8M165 39v12" stroke="#8a90a0" stroke-width="1" />
-        <circle cx="178" cy="60" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
+        <path d="M172 82Q204 76 197 60" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
+        <path d="M197 62L186 52" stroke="#26262e" stroke-width="5" stroke-linecap="round" />
+        <circle cx="182" cy="48" r="8" fill="#cfd3dc" stroke="#555a68" stroke-width="2" />
+        <path d="M176 46h12M177 50h10M182 41v14" stroke="#8a90a0" stroke-width="1" />
+        <circle cx="197" cy="62" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
       }
       @case ('vaper') {
-        <path d="M172 80Q190 72 178 58" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
-        <path d="M186 64L164 52L167 45L189 57Z" [attr.fill]="'url(#' + id.vape + ')'" stroke="#14161c" stroke-width="1.8" stroke-linejoin="round" />
-        <path d="M177 57L170 53L171.6 50L178.6 54Z" fill="#ff9ad5" stroke="#14161c" stroke-width="1" />
-        <path d="M165 51L158 48.5L160.5 43.5L167 46Z" fill="#1a1c22" />
-        <circle class="ship__led" cx="183" cy="59" r="2" fill="#eaffff" />
-        <circle cx="178" cy="60" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
+        <path d="M172 82Q206 76 199 60" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
+        <path d="M206 66L184 54L187 47L209 59Z" [attr.fill]="'url(#' + id.vape + ')'" stroke="#14161c" stroke-width="1.8" stroke-linejoin="round" />
+        <path d="M197 59L190 55L191.6 52L198.6 56Z" fill="#ff9ad5" stroke="#14161c" stroke-width="1" />
+        <path d="M185 53L178 50.5L180.5 45.5L187 48Z" fill="#1a1c22" />
+        <circle class="ship__led" cx="203" cy="61" r="2" fill="#eaffff" />
+        <circle cx="199" cy="62" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
       }
       @default {
         <path d="M172 80Q194 76 205 63" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
@@ -138,15 +140,15 @@
   <!-- Vape clouds and song notes drift back from the mouth -->
   @if (c.delante === 'vaper' && mode() !== 'fall') {
     <g class="ship__puffs" fill="#f4f1ff" fill-opacity=".85">
-      <circle cx="150" cy="50" r="8" />
-      <circle cx="150" cy="50" r="10" />
-      <circle cx="150" cy="50" r="7" />
+      <circle cx="180" cy="46" r="8" />
+      <circle cx="180" cy="46" r="10" />
+      <circle cx="180" cy="46" r="7" />
     </g>
   }
   @if (c.delante === 'micro' && mode() !== 'fall') {
     <g class="ship__notes" [attr.fill]="c.color" stroke="#1d1626" stroke-width=".8">
-      <text x="128" y="30">♪</text>
-      <text x="128" y="30">♫</text>
+      <text x="190" y="36">♪</text>
+      <text x="190" y="36">♫</text>
     </g>
   }
 </svg>

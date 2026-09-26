@@ -55,15 +55,12 @@
 }
 
 .ship__head {
-  transform-origin: 150px 60px;
+  transform-origin: 150px 62px;
   animation: nod 1.4s ease-in-out infinite alternate;
 }
 
-/* Real photos read better a bit big, bobblehead style. */
-.ship__head--photo { scale: 1.22; }
-
 .ship__puffs circle {
-  transform-origin: 150px 50px;
+  transform-origin: 180px 46px;
   opacity: 0;
   animation: puff 3.6s ease-out infinite;
 }
@@ -83,7 +80,7 @@
 .ship__pet {
   position: absolute;
   top: 29%;
-  left: 25%;
+  left: 20%;
   width: 17%;
   filter: drop-shadow(0 0 1px rgb(255 248 230 / 75%));
   animation: ride 600ms ease-in-out infinite alternate;
@@ -91,8 +88,8 @@
 
 .ship__finger {
   position: absolute;
-  top: -70%;
-  left: 56%;
+  top: -78%;
+  left: 74%;
   width: 27%;
   filter: drop-shadow(0 3px 3px rgb(0 0 0 / 40%));
   transform-origin: 50% 100%;
@@ -105,7 +102,7 @@
 :host(.ship--fall) .ship__head { animation: shake 90ms linear infinite alternate; }
 
 .ship__dizzy {
-  transform-origin: 150px 12px;
+  transform-origin: 150px 8px;
   animation: spin 700ms linear infinite;
 }
 
@@ -124,13 +121,13 @@
 @keyframes puff {
   0%, 55% { opacity: 0; transform: translate(0, 0) scale(.3); }
   62% { opacity: .9; }
-  100% { opacity: 0; transform: translate(-46px, -14px) scale(2.1); }
+  100% { opacity: 0; transform: translate(14px, -40px) scale(2.1); }
 }
 
 @keyframes note {
   0% { opacity: 0; transform: translate(0, 0) rotate(0); }
   20% { opacity: 1; }
-  100% { opacity: 0; transform: translate(-34px, -18px) rotate(-20deg); }
+  100% { opacity: 0; transform: translate(16px, -30px) rotate(18deg); }
 }
 
 @keyframes finger {
