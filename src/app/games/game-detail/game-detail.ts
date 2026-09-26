@@ -11,8 +11,8 @@ import { OpenRoomList } from '../../rooms/open-room-list';
   selector: 'app-game-detail',
   imports: [RouterLink, CreateRoomForm, JoinByCodeForm, OpenRoomList],
   template: `
-    <nav class="mb-3" aria-label="Navegación">
-      <a routerLink="/juegos" class="link-primary">← Volver a los juegos</a>
+    <nav class="page-crumb" aria-label="Navegación">
+      <a routerLink="/juegos" class="pasta-link">← Volver al menú de la tripulación</a>
     </nav>
 
     @if (loading()) {
@@ -23,10 +23,14 @@ import { OpenRoomList } from '../../rooms/open-room-list';
     } @else if (error()) {
       <div class="alert alert-danger" role="alert">No se ha podido cargar el juego: {{ error() }}</div>
     } @else if (game(); as game) {
-      <h2 class="h3 mb-2">{{ game.nombre }}</h2>
-      @if (game.descripcion) {
-        <p class="text-body-secondary mb-3">{{ game.descripcion }}</p>
-      }
+      <section class="page-intro page-intro--compact" aria-labelledby="game-title">
+        <p class="page-intro__eyebrow">A preparar el viaje</p>
+        <h1 id="game-title" class="page-title">{{ game.nombre }}</h1>
+        <p class="page-intro__copy">
+          {{ game.descripcion ?? 'Cread una sala o uníos con vuestro código para empezar a jugar.' }}
+        </p>
+      </section>
+
       @if (!isPlayable()) {
         <div class="alert alert-info" role="status">
           Este juego todavía no se puede jugar: puedes crear la sala e invitar, pero la partida llegará pronto.
@@ -37,7 +41,7 @@ import { OpenRoomList } from '../../rooms/open-room-list';
         <div class="col-12 col-md-6">
           <section class="card h-100 shadow-sm" aria-labelledby="create-room-title">
             <div class="card-body">
-              <h3 id="create-room-title" class="h5 card-title">Crear sala</h3>
+              <h2 id="create-room-title" class="h5 card-title">Crear sala</h2>
               <app-create-room-form [gameId]="game.id" />
             </div>
           </section>
@@ -45,7 +49,7 @@ import { OpenRoomList } from '../../rooms/open-room-list';
         <div class="col-12 col-md-6">
           <section class="card h-100 shadow-sm" aria-labelledby="join-room-title">
             <div class="card-body">
-              <h3 id="join-room-title" class="h5 card-title">Unirse con código</h3>
+              <h2 id="join-room-title" class="h5 card-title">Unirse con código</h2>
               <app-join-by-code-form />
             </div>
           </section>

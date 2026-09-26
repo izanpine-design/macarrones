@@ -8,7 +8,7 @@ import { RoomService } from '../core/room.service';
   imports: [RouterLink],
   template: `
     <div class="d-flex align-items-center justify-content-between mb-2">
-      <h3 class="h5 m-0">Salas abiertas</h3>
+      <h2 class="h5 m-0">Salas abiertas</h2>
       <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading()" (click)="load()">
         Actualizar
       </button>

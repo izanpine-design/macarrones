@@ -17,7 +17,13 @@ import { TruthOrDareGame } from './truth-or-dare/truth-or-dare-game';
   selector: 'app-room-page',
   imports: [RouterLink, RoomLobby, RoomPasswordForm, TruthOrDareGame],
   template: `
-    <div class="row justify-content-center">
+    <section class="page-intro page-intro--compact" aria-label="Sala de juego">
+      <p class="page-intro__eyebrow">Estación de la tripulación</p>
+      <h1 class="page-title">¡Pasta a la vista!</h1>
+      <p class="page-intro__copy">La pandilla está a punto de despegar.</p>
+    </section>
+
+    <div class="row justify-content-center room-layout">
       <div class="col-12 col-md-8 col-lg-6">
         @if (loading()) {
           <div class="d-flex align-items-center gap-2" role="status">
