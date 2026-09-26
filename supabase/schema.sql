@@ -7,7 +7,7 @@ begin;
 -- Reset -------------------------------------------------------------------------
 
 -- Rooms depend on juegos: they are dropped too, run salas.sql again afterwards.
-drop table if exists public.jugadores_sala, public.salas_privado, public.salas cascade;
+drop table if exists public.turnos, public.jugadores_sala, public.salas_privado, public.salas cascade;
 drop table if exists public.preguntas cascade;
 drop table if exists public.juegos    cascade;
 drop table if exists public.niveles   cascade;
@@ -17,6 +17,7 @@ drop type  if exists public.tipo_pregunta cascade;
 
 create table public.juegos (
   id     int generated always as identity primary key,
+  clave  text not null unique,  -- stable identifier used by the game logic
   nombre text not null unique
 );
 
@@ -57,8 +58,8 @@ grant select on public.juegos, public.niveles, public.preguntas to anon, authent
 
 -- Seed data ---------------------------------------------------------------------
 
-insert into public.juegos (nombre) values ('Yo nunca nunca');  -- id 1
-insert into public.juegos (nombre) values ('Verdad o reto');   -- id 2
+insert into public.juegos (clave, nombre) values ('yo_nunca', 'Yo nunca nunca');      -- id 1
+insert into public.juegos (clave, nombre) values ('verdad_o_reto', 'Verdad o reto'); -- id 2
 
 insert into public.niveles (nombre, orden) values ('suave', 1);   -- id 1
 insert into public.niveles (nombre, orden) values ('picante', 2); -- id 2

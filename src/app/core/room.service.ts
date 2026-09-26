@@ -4,7 +4,7 @@ import { PlayerService } from './player.service';
 import { SupabaseService } from './supabase.service';
 import { OpenRoom, RoomInfo, RoomPlayer } from './room.model';
 
-/** Error codes raised by the room functions in supabase/salas.sql. */
+/** Error codes raised by the room and game functions in supabase/salas.sql. */
 export type RoomErrorCode =
   | 'NOT_AUTHENTICATED'
   | 'INVALID_NICKNAME'
@@ -14,6 +14,14 @@ export type RoomErrorCode =
   | 'ROOM_CLOSED'
   | 'PASSWORD_REQUIRED'
   | 'WRONG_PASSWORD'
+  | 'NOT_HOST'
+  | 'WRONG_PHASE'
+  | 'GAME_NOT_SUPPORTED'
+  | 'GAME_NOT_STARTED'
+  | 'NOT_ENOUGH_PLAYERS'
+  | 'NOT_YOUR_TURN'
+  | 'NO_QUESTIONS'
+  | 'INVALID_QUESTION'
   | 'UNKNOWN';
 
 const ERROR_MESSAGES: Record<RoomErrorCode, string> = {
@@ -25,6 +33,14 @@ const ERROR_MESSAGES: Record<RoomErrorCode, string> = {
   ROOM_CLOSED: 'Esta sala ya ha terminado.',
   PASSWORD_REQUIRED: 'Esta sala tiene contraseña.',
   WRONG_PASSWORD: 'Contraseña incorrecta.',
+  NOT_HOST: 'Solo el anfitrión puede hacer esto.',
+  WRONG_PHASE: 'Esto ya no se puede hacer en este momento de la partida.',
+  GAME_NOT_SUPPORTED: 'Este juego todavía no se puede jugar.',
+  GAME_NOT_STARTED: 'La partida no ha empezado.',
+  NOT_ENOUGH_PLAYERS: 'Hacen falta al menos 2 jugadores.',
+  NOT_YOUR_TURN: 'No es tu turno.',
+  NO_QUESTIONS: 'No hay preguntas de este tipo. Escríbela tú.',
+  INVALID_QUESTION: 'La pregunta debe tener entre 3 y 300 caracteres.',
   UNKNOWN: 'Ha ocurrido un error inesperado.',
 };
 
@@ -37,7 +53,7 @@ export class RoomError extends Error {
   }
 }
 
-function toRoomError(error: { message: string }): RoomError {
+export function toRoomError(error: { message: string }): RoomError {
   const code = error.message in ERROR_MESSAGES ? (error.message as RoomErrorCode) : 'UNKNOWN';
   return new RoomError(code, error.message);
 }
@@ -115,9 +131,23 @@ export class RoomService {
     };
   }
 
+  /** Host only: starts the game (2+ players). */
+  async startGame(roomId: string): Promise<void> {
+    await this.auth.ensureSignedIn();
+    const { error } = await this.supabase.rpc('empezar_partida', { p_sala_id: roomId });
+    if (error) throw toRoomError(error);
+  }
+
+  /** Host only: ends the game and goes back to the waiting lobby. */
+  async endGame(roomId: string): Promise<void> {
+    await this.auth.ensureSignedIn();
+    const { error } = await this.supabase.rpc('terminar_partida', { p_sala_id: roomId });
+    if (error) throw toRoomError(error);
+  }
+
   /**
-   * Calls `onChange` whenever the room or its players change (Supabase Realtime).
-   * Returns a function that stops listening.
+   * Calls `onChange` whenever the room, its players or its turns change
+   * (Supabase Realtime). Returns a function that stops listening.
    */
   watchRoom(roomId: string, onChange: () => void): () => void {
     const channel = this.supabase
@@ -130,6 +160,11 @@ export class RoomService {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'salas', filter: `id=eq.${roomId}` },
+        () => onChange(),
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'turnos', filter: `sala_id=eq.${roomId}` },
         () => onChange(),
       )
       .subscribe();

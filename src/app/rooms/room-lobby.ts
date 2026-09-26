@@ -1,9 +1,11 @@
-import { Component, computed, DestroyRef, DOCUMENT, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, DOCUMENT, inject, input, signal } from '@angular/core';
 import { AuthService } from '../core/auth.service';
-import { RoomInfo, RoomPlayer } from '../core/room.model';
+import { PLAYABLE_GAMES, RoomInfo, RoomPlayer } from '../core/room.model';
 import { roomErrorMessage, RoomService } from '../core/room.service';
 
-/** Waiting room: live list of players, invite button and leave button. */
+const MIN_PLAYERS = 2;
+
+/** Waiting room: invite button, players and (for the host) the start button. */
 @Component({
   selector: 'app-room-lobby',
   template: `
@@ -27,9 +29,6 @@ import { roomErrorMessage, RoomService } from '../core/room.service';
     <section class="card shadow-sm mb-3" aria-labelledby="players-title">
       <div class="card-body">
         <h2 id="players-title" class="h5">Jugadores ({{ players().length }})</h2>
-        @if (error()) {
-          <div class="alert alert-danger" role="alert">{{ error() }}</div>
-        }
         <ul class="list-group list-group-flush" aria-live="polite">
           @for (player of players(); track player.user_id) {
             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
@@ -48,41 +47,65 @@ import { roomErrorMessage, RoomService } from '../core/room.service';
       </div>
     </section>
 
-    @if (isHost()) {
-      <p class="text-body-secondary text-center">
-        Eres el anfitrión. Pronto podrás empezar la partida desde aquí.
-      </p>
+    @if (!isPlayable()) {
+      <p class="text-body-secondary text-center">Este juego todavía no se puede jugar. ¡Pronto!</p>
+    } @else if (isHost()) {
+      <button
+        type="button"
+        class="btn btn-success btn-lg w-100 mb-2"
+        [disabled]="!enoughPlayers() || starting()"
+        [attr.aria-describedby]="enoughPlayers() ? null : 'start-help'"
+        (click)="start()"
+      >
+        @if (starting()) {
+          <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+        }
+        Empezar partida
+      </button>
+      @if (!enoughPlayers()) {
+        <p id="start-help" class="small text-body-secondary text-center">
+          Hacen falta al menos {{ minPlayers }} jugadores. ¡Invita a alguien!
+        </p>
+      }
     } @else {
-      <p class="text-body-secondary text-center">Esperando a que el anfitrión empiece la partida…</p>
+      <p class="text-body-secondary text-center" role="status">Esperando a que el anfitrión empiece la partida…</p>
     }
 
-    <button type="button" class="btn btn-outline-danger w-100" [disabled]="leaving()" (click)="leave()">
-      Salir de la sala
-    </button>
+    @if (error()) {
+      <div class="alert alert-danger" role="alert">{{ error() }}</div>
+    }
   `,
 })
-export class RoomLobby implements OnInit {
+export class RoomLobby {
   private readonly rooms = inject(RoomService);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly window = inject(DOCUMENT).defaultView;
 
   readonly room = input.required<RoomInfo>();
-  readonly left = output();
+  readonly players = input.required<RoomPlayer[]>();
+  readonly hostId = input.required<string | null>();
 
+  protected readonly minPlayers = MIN_PLAYERS;
   protected readonly userId = inject(AuthService).userId;
-  protected readonly players = signal<RoomPlayer[]>([]);
-  protected readonly hostId = signal<string | null>(null);
   protected readonly error = signal<string | null>(null);
-  protected readonly leaving = signal(false);
+  protected readonly starting = signal(false);
   protected readonly inviteFeedback = signal('');
 
   protected readonly isHost = computed(() => this.hostId() !== null && this.hostId() === this.userId());
+  protected readonly isPlayable = computed(() => PLAYABLE_GAMES.includes(this.room().juego_clave ?? ''));
+  protected readonly enoughPlayers = computed(() => this.players().length >= MIN_PLAYERS);
   protected readonly spelledCode = computed(() => this.room().codigo.split('').join(' '));
 
-  ngOnInit(): void {
-    void this.refresh();
-    const stopWatching = this.rooms.watchRoom(this.room().id, () => void this.refresh());
-    this.destroyRef.onDestroy(stopWatching);
+  protected async start(): Promise<void> {
+    this.starting.set(true);
+    this.error.set(null);
+    try {
+      // The page switches to the game screen through Realtime.
+      await this.rooms.startGame(this.room().id);
+    } catch (e) {
+      this.error.set(roomErrorMessage(e));
+    } finally {
+      this.starting.set(false);
+    }
   }
 
   protected async invite(): Promise<void> {
@@ -109,28 +132,6 @@ export class RoomLobby implements OnInit {
       this.inviteFeedback.set('Enlace copiado. ¡Pásalo a tus amigos!');
     } catch {
       this.inviteFeedback.set(`Copia este enlace: ${url}`);
-    }
-  }
-
-  protected async leave(): Promise<void> {
-    this.leaving.set(true);
-    try {
-      await this.rooms.leaveRoom(this.room().id);
-      this.left.emit();
-    } catch (e) {
-      this.error.set(roomErrorMessage(e));
-      this.leaving.set(false);
-    }
-  }
-
-  private async refresh(): Promise<void> {
-    try {
-      const { hostId, players } = await this.rooms.getLobby(this.room().id);
-      this.hostId.set(hostId);
-      this.players.set(players);
-      this.error.set(null);
-    } catch (e) {
-      this.error.set(roomErrorMessage(e));
     }
   }
 }
