@@ -33,6 +33,10 @@
 .intro__pilot--1 { top: 30%; left: 72%; --dx: -22vw; --dy: 20vh; animation-delay: -.4s; }
 .intro__pilot--2 { top: 66%; left: 28%; --dx: 22vw; --dy: -16vh; animation-delay: -.8s; }
 .intro__pilot--3 { top: 58%; left: 72%; --dx: -22vw; --dy: -8vh; animation-delay: -1.1s; }
+.intro__pilot--4 { top: 20%; left: 48%; --dx: 2vw; --dy: 26vh; animation-delay: -.6s; }
+.intro__pilot--5 { top: 80%; left: 50%; --dx: 0vw; --dy: -30vh; animation-delay: -.9s; }
+/* Your own rocket leads the formation, in the middle. */
+.intro__pilot--lead { top: 48%; left: 50%; z-index: 1; width: clamp(150px, 34vw, 270px); animation-delay: -.2s; }
 
 .intro__ship { rotate: -18deg; }
 
@@ -69,6 +73,8 @@
 .intro--warp .intro__bailout { animation: bail 1.4s ease-out forwards; }
 .intro__pilot--0 .intro__bailout, .intro__pilot--2 .intro__bailout { --ex: -34vw; }
 .intro__pilot--1 .intro__bailout, .intro__pilot--3 .intro__bailout { --ex: 34vw; }
+.intro__pilot--lead .intro__bailout, .intro__pilot--4 .intro__bailout { --ex: 0vw; }
+.intro__pilot--5 .intro__bailout { --ex: -20vw; }
 
 /* ---------- Planets zooming past in hyperspace ---------- */
 
@@ -224,6 +230,9 @@
   .intro__pilot--1 { top: 26%; left: 72%; }
   .intro__pilot--2 { top: 70%; left: 28%; }
   .intro__pilot--3 { top: 62%; left: 72%; }
+  .intro__pilot--4 { top: 16%; left: 50%; }
+  .intro__pilot--5 { top: 84%; left: 50%; }
+  .intro__pilot--lead { top: 48%; left: 50%; }
   .intro__label { font-size: .8rem; }
   .intro__launch { font-size: 1.35rem; }
 }

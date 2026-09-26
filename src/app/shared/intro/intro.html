@@ -11,14 +11,16 @@
 
     <!-- The crew in formation; each pet bails out in hyperspace -->
     <div class="intro__stage" aria-hidden="true">
-      @for (c of crew; track c.member.id; let i = $index) {
-        <div class="intro__pilot" [class]="'intro__pilot--' + i">
-          <app-rocket-ship class="intro__ship" [crew]="c.member" [uid]="c.uid" />
-          <span class="intro__label" [style.--label]="c.member.color">{{ c.member.nombre }} {{ c.label }}</span>
-          <div class="intro__bailout">
-            <app-pixel-sprite class="intro__chute" [frame]="parachute" [palette]="c.pet.chutePalette" />
-            <app-pixel-sprite class="intro__pet" [frame]="c.pet.art.frames.stand" [palette]="c.pet.art.palette" />
-          </div>
+      @for (c of pilots(); track c.look.key) {
+        <div class="intro__pilot" [class]="'intro__pilot--' + c.slot">
+          <app-rocket-ship class="intro__ship" [crew]="c.look" [uid]="c.uid" />
+          <span class="intro__label" [style.--label]="c.look.color">{{ c.look.nombre }} {{ c.label }}</span>
+          @if (c.pet; as pet) {
+            <div class="intro__bailout">
+              <app-pixel-sprite class="intro__chute" [frame]="parachute" [palette]="pet.chutePalette" />
+              <app-pixel-sprite class="intro__pet" [frame]="pet.art.frames.stand" [palette]="pet.art.palette" />
+            </div>
+          }
         </div>
       }
     </div>

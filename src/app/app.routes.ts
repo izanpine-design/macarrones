@@ -24,6 +24,12 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'ajustes',
+    canActivate: [nicknameGuard],
+    title: 'Mi nave · Macarrones',
+    loadComponent: () => import('./settings/ship-settings').then((m) => m.ShipSettings),
+  },
+  {
     path: 'sala/:codigo',
     canActivate: [nicknameGuard],
     title: 'Sala · Macarrones',

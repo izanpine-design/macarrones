@@ -1,7 +1,8 @@
-import { afterNextRender, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
-import { CREW, OBJECT_EMOJI } from '../crew/crew';
+import { Component, computed, DestroyRef, DOCUMENT, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
+import { ProfileService } from '../../core/profile.service';
+import { CrewObject, OBJECT_EMOJI } from '../crew/crew';
 import { PetService } from '../pets/pet.service';
-import { PETS } from '../pets/pets';
+import { PET_BY_ID, PETS } from '../pets/pets';
 import { PARACHUTE } from '../pixel/pixel-art';
 import { PixelSprite } from '../pixel/pixel-sprite';
 import { RocketShip } from '../rockets/rocket-ship';
@@ -17,10 +18,10 @@ const SEEN_KEY = 'macarrones.intro';
 const STAR_SPEED: Record<Stage, number> = { ready: 0.6, countdown: 0.8, launch: 2.5, warp: 22, arrive: 0.6, leaving: 0.6 };
 
 /**
- * Opening show, once per session on the welcome page: countdown, the crew
- * taking off in formation, jump to hyperspace past the pasta planets (the pets
- * bail out in parachutes) and arrival at "Macarrones". Skippable, and it can
- * be replayed from the welcome page (IntroService).
+ * Opening show, once per session after choosing who you are: countdown, the
+ * players' rockets taking off in formation, jump to hyperspace past the pasta
+ * planets (the pets bail out in parachutes) and arrival at "Macarrones".
+ * Skippable, and it can be replayed from the welcome page (IntroService).
  */
 @Component({
   selector: 'app-intro',
@@ -33,16 +34,27 @@ export class Intro {
   private readonly document = inject(DOCUMENT);
   private readonly sfx = inject(SfxService);
   private readonly petService = inject(PetService);
+  private readonly profiles = inject(ProfileService);
 
   protected readonly visible = signal(false);
   protected readonly stage = signal<Stage>('ready');
   protected readonly count = signal(3);
-  protected readonly crew = CREW.map((member, i) => ({
-    member,
-    uid: 9000 + i,
-    label: [member.delante, member.detras].flatMap((o) => (o ? [OBJECT_EMOJI[o]] : [])).join(''),
-    pet: PETS.find((pet) => pet.owner.id === member.id)!,
-  }));
+  /**
+   * The rockets of the formation (up to 6): yours in the middle, then the rest
+   * of the showcase. Slots match the positions in intro.css.
+   */
+  protected readonly pilots = computed(() => {
+    const showcase = this.profiles.showcase();
+    const ownKey = this.profiles.own() ? `user:${this.profiles.own()!.user_id}` : null;
+    let next = 0;
+    return showcase.map((look, i) => ({
+      look,
+      uid: 9000 + i,
+      slot: look.key === ownKey ? 'lead' : String(next++),
+      label: objectLabel(look.delante, look.detras),
+      pet: look.mascota ? (PET_BY_ID.get(look.mascota) ?? null) : null,
+    }));
+  });
   protected readonly parachute = PARACHUTE;
 
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('stars');
@@ -53,8 +65,10 @@ export class Intro {
   constructor() {
     const destroyRef = inject(DestroyRef);
     destroyRef.onDestroy(() => this.stop());
-    afterNextRender(() => {
-      if (this.shouldShow()) this.open();
+    // Not on arrival: once the player has chosen their profile / guest nickname.
+    const firstRuns = inject(IntroService).firstRuns;
+    effect(() => {
+      if (firstRuns() > 0) untracked(() => this.shouldShow() && this.open());
     });
     // "Ver presentación" on the welcome page: the user asked for it, so it
     // plays even with reduced motion or if it was already seen.
@@ -124,8 +138,7 @@ export class Intro {
 
   private shouldShow(): boolean {
     const window = this.document.defaultView;
-    if (window?.location.pathname !== '/') return false;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
+    if (!window || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
     try {
       return window.sessionStorage.getItem(SEEN_KEY) !== '1';
     } catch {
@@ -153,4 +166,8 @@ export class Intro {
     const id = this.document.defaultView?.setTimeout(fn, ms);
     if (id !== undefined) this.timers.push(id);
   }
+}
+
+function objectLabel(delante: CrewObject | null, detras: CrewObject | null): string {
+  return [delante, detras].flatMap((o) => (o ? [OBJECT_EMOJI[o]] : [])).join('');
 }

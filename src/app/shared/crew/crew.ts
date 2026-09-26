@@ -83,13 +83,3 @@ export const CREW: readonly CrewMember[] = [
     mascota: 'enana',
   },
 ];
-
-function normalize(text: string): string {
-  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-}
-
-/** Crew member a room nickname refers to ("Migue", "raúl 🍺"…), or null. */
-export function crewForNickname(nickname: string): CrewMember | null {
-  const words = normalize(nickname).split(/[^a-z0-9]+/).filter(Boolean);
-  return CREW.find((member) => member.alias.some((alias) => words.includes(alias))) ?? null;
-}

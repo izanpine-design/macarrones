@@ -1,7 +1,7 @@
 import { NgOptimizedImage } from '@angular/common';
 import { afterRenderEffect, Component, computed, DOCUMENT, effect, ElementRef, inject, input, untracked, viewChild } from '@angular/core';
 import { CrewHead } from '../crew/crew-head';
-import { crewForNickname } from '../crew/crew';
+import { ProfileService } from '../../core/profile.service';
 import { PET_BY_ID } from '../pets/pets';
 import { BEER_MUG, BEER_PALETTE } from '../pixel/pixel-art';
 import { PixelSprite } from '../pixel/pixel-sprite';
@@ -37,14 +37,19 @@ export class DrinkAlert {
   readonly roomId = input.required<string>();
 
   protected readonly call = this.drinks.call;
+  private readonly profiles = inject(ProfileService);
+
+  /** Rocket of whoever drinks, found by their user id (guests have none). */
   protected readonly crew = computed(() => {
     const call = this.call();
-    return call ? crewForNickname(call.apodo) : null;
+    return call ? this.profiles.lookFor(call.userId) : null;
   });
-  protected readonly name = computed(() => this.crew()?.nombre ?? this.call()?.apodo ?? '');
+  /** Their own "¡A beber!" background, if they uploaded one and use it. */
+  protected readonly background = computed(() => this.crew()?.fondoBeber ?? null);
+  protected readonly name = computed(() => this.call()?.apodo ?? '');
   protected readonly pet = computed(() => {
     const crew = this.crew();
-    return crew ? (PET_BY_ID.get(crew.mascota) ?? null) : null;
+    return crew?.mascota ? (PET_BY_ID.get(crew.mascota) ?? null) : null;
   });
   protected readonly reason = computed(() => {
     const call = this.call();

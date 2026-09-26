@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { RoomInfo, RoomPlayer, Turn } from '../core/room.model';
 import { roomErrorMessage, RoomService } from '../core/room.service';
 import { TurnService } from '../core/turn.service';
+import { ProfileService } from '../core/profile.service';
 import { RoomLobby } from './room-lobby';
 import { RoomPasswordForm } from './room-password-form';
 import { TruthOrDareGame } from './truth-or-dare/truth-or-dare-game';
@@ -84,6 +85,7 @@ export class RoomPage {
   private readonly turns = inject(TurnService);
   private readonly router = inject(Router);
   private readonly themes = inject(GameThemeService);
+  private readonly profiles = inject(ProfileService);
 
   /** Route parameter `:codigo`. */
   readonly codigo = input.required<string>();
@@ -173,6 +175,11 @@ export class RoomPage {
     this.players.set(lobby.players);
     this.hostId.set(lobby.hostId);
     this.turn.set(turn);
+    // Rockets and heads of whoever is in the room (lobby, "¡A beber!"). Not
+    // blocking: without them players show with their initial.
+    this.profiles.ensureProfiles(lobby.players.map((p) => p.user_id)).catch((e: unknown) => {
+      console.warn('[RoomPage] No se han podido cargar los perfiles de la sala:', e);
+    });
   }
 
   private normalizedCode(): string {

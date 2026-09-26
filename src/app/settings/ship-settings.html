@@ -1,0 +1,284 @@
+<section class="page-intro page-intro--compact" aria-labelledby="settings-title">
+  <p class="page-intro__eyebrow">{{ bienvenida() ? 'Último paso antes de despegar' : 'Taller de naves' }}</p>
+  <h1 id="settings-title" class="page-title">Mi nave</h1>
+  <p class="page-intro__copy">Todo lo que cambies aquí lo verán los demás: en la portada, la presentación y las salas.</p>
+</section>
+
+@switch (profiles.state()) {
+  @case ('error') {
+    <div class="alert alert-danger" role="alert">
+      {{ profiles.error() }}
+      <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="profiles.load(true)">Reintentar</button>
+    </div>
+  }
+  @case ('ready') {
+    @if (profiles.own(); as own) {
+      <form class="settings" novalidate (submit)="save($event)">
+        <div class="settings__preview card shadow-sm" aria-live="polite">
+          <div class="card-body">
+            <h2 class="h5">Vista previa</h2>
+            @if (look(); as l) {
+              <app-rocket-ship class="settings__ship" [crew]="l" [pet]="pet()" [uid]="7000" />
+              <div class="settings__head-row">
+                <app-crew-head class="settings__head" [crew]="l" [nickname]="l.nombre" />
+                <p class="mb-0 small">
+                  @if (ship().nave === 'imagen') {
+                    <strong>Modo: imagen completa.</strong> Tu imagen sustituye al dibujo de la nave.
+                  } @else {
+                    <strong>Modo: nave por piezas.</strong> Colores, cara y objetos se dibujan en el macarrón.
+                  }
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="settings__form">
+          <!-- Name -->
+          <div class="card shadow-sm mb-3">
+            <fieldset class="card-body">
+              <legend class="h5">Nombre</legend>
+              <label for="settings-apodo" class="form-label">Apodo (sale pintado en tu nave)</label>
+              <input
+                id="settings-apodo"
+                type="text"
+                class="form-control"
+                autocomplete="nickname"
+                aria-required="true"
+                [formField]="nameForm.apodo"
+                [class.is-invalid]="showNameErrors()"
+                [attr.aria-invalid]="showNameErrors()"
+                [attr.aria-describedby]="showNameErrors() ? 'settings-apodo-error' : null"
+              />
+              @if (showNameErrors()) {
+                <div id="settings-apodo-error" class="invalid-feedback">{{ nameForm.apodo().errors()[0].message }}</div>
+              }
+            </fieldset>
+          </div>
+
+          <!-- Rocket style -->
+          <div class="card shadow-sm mb-3">
+            <fieldset class="card-body">
+              <legend class="h5">Tipo de nave</legend>
+              <div class="form-check">
+                <input id="style-piezas" class="form-check-input" type="radio" name="ship-style" [checked]="ship().nave === 'piezas'" (change)="setStyle('piezas')" />
+                <label for="style-piezas" class="form-check-label">Nave por piezas (el macarrón, con tus colores, cara y objetos)</label>
+              </div>
+              <div class="form-check">
+                <input id="style-imagen" class="form-check-input" type="radio" name="ship-style" [checked]="ship().nave === 'imagen'" (change)="setStyle('imagen')" />
+                <label for="style-imagen" class="form-check-label">Imagen completa (subes el dibujo o foto de tu nave)</label>
+              </div>
+              @if (ship().nave === 'imagen') {
+                <div class="mt-3">
+                  <app-picture-field
+                    kind="nave"
+                    label="Imagen de la nave"
+                    hint="Mejor apaisada y con fondo transparente (PNG)."
+                    [value]="ship().naveImagen"
+                    (valueChange)="set('naveImagen', $event)"
+                  />
+                  @if (missingShipPicture()) {
+                    <p class="text-danger small mt-2 mb-0">Sube una imagen o vuelve a la nave por piezas.</p>
+                  }
+                </div>
+              }
+            </fieldset>
+          </div>
+
+          <!-- Colours -->
+          <div class="card shadow-sm mb-3">
+            <fieldset class="card-body">
+              <legend class="h5">Colores</legend>
+              @if (ship().nave === 'imagen') {
+                <p class="small text-body-secondary">Con imagen completa, los colores se usan en la estela, tu nombre y los avisos.</p>
+              }
+              <div class="settings__colors">
+                <label class="settings__color">
+                  <input type="color" [value]="ship().color" (input)="set('color', $any($event.target).value)" />
+                  Principal
+                </label>
+                <label class="settings__color">
+                  <input type="color" [value]="ship().colorOscuro" (input)="set('colorOscuro', $any($event.target).value)" />
+                  Oscuro
+                </label>
+                @if (ship().nave === 'piezas') {
+                  <label class="settings__color">
+                    <input type="color" [value]="ship().pelo" (input)="set('pelo', $any($event.target).value)" />
+                    Pelo (cara dibujada)
+                  </label>
+                }
+              </div>
+            </fieldset>
+          </div>
+
+          <!-- Objects: only drawn on the macaroni rocket -->
+          @if (ship().nave === 'piezas') {
+            <div class="card shadow-sm mb-3">
+              <fieldset class="card-body">
+                <legend class="h5">Objetos</legend>
+                <div class="row g-2">
+                  <div class="col-12 col-sm-6">
+                    <label for="object-front" class="form-label">En la mano de delante</label>
+                    <select id="object-front" class="form-select" (change)="setObject('delante', $any($event.target).value)">
+                      <option value="" [selected]="!ship().delante">Nada</option>
+                      @for (o of objects; track o.id) {
+                        <option [value]="o.id" [selected]="ship().delante === o.id">{{ o.label }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="col-12 col-sm-6">
+                    <label for="object-back" class="form-label">En la mano levantada</label>
+                    <select id="object-back" class="form-select" (change)="setObject('detras', $any($event.target).value)">
+                      <option value="" [selected]="!ship().detras">Nada</option>
+                      @for (o of objects; track o.id) {
+                        <option [value]="o.id" [selected]="ship().detras === o.id">{{ o.label }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          }
+
+          <!-- Pet -->
+          <div class="card shadow-sm mb-3">
+            <fieldset class="card-body">
+              <legend class="h5">Mascota</legend>
+              <label for="settings-pet" class="form-label">Viaja en tu nave y brinda contigo en «¡A beber!»</label>
+              <select id="settings-pet" class="form-select" (change)="setPet($any($event.target).value)">
+                <option value="" [selected]="!ship().mascota">Sin mascota</option>
+                @for (p of pets; track p.id) {
+                  <option [value]="p.id" [selected]="ship().mascota === p.id">{{ p.nombre }}</option>
+                }
+              </select>
+            </fieldset>
+          </div>
+
+          <!-- Pictures -->
+          <div class="card shadow-sm mb-3">
+            <fieldset class="card-body">
+              <legend class="h5">Fotos</legend>
+              <p class="small text-body-secondary">
+                <span aria-hidden="true">⚠️</span> Las fotos las verá cualquiera que entre en la web. Sube solo fotos tuyas o de quien te
+                haya dado permiso.
+              </p>
+              <app-picture-field
+                kind="cabeza"
+                label="Foto de tu cara"
+                hint="Se recorta en círculo. Sin foto, se dibuja una cara."
+                emptyText="Cara dibujada"
+                [value]="ship().cabeza"
+                (valueChange)="set('cabeza', $event)"
+              />
+              <hr />
+              <app-picture-field
+                kind="fondo"
+                label="Fondo de «¡A beber!»"
+                hint="Sustituye la foto de siempre cuando te toca beber."
+                emptyText="Foto de siempre"
+                [value]="ship().fondoBeber"
+                (valueChange)="set('fondoBeber', $event)"
+              />
+              @if (ship().fondoBeber) {
+                <div class="form-check mt-2">
+                  <input id="use-drink-bg" class="form-check-input" type="checkbox" [checked]="ship().usarFondoBeber" (change)="set('usarFondoBeber', $any($event.target).checked)" />
+                  <label for="use-drink-bg" class="form-check-label">Usar mi fondo en «¡A beber!»</label>
+                </div>
+              }
+            </fieldset>
+          </div>
+
+          <div aria-live="polite">
+            @if (error()) {
+              <div class="alert alert-danger" role="alert">{{ error() }}</div>
+            }
+            @if (saved() && !bienvenida()) {
+              <div class="alert alert-success">¡Nave guardada! Ya la ven los demás.</div>
+            }
+          </div>
+
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            <button type="submit" class="btn btn-primary btn-lg flex-grow-1" [disabled]="busy()">
+              @if (busy()) {
+                <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+              }
+              {{ bienvenida() ? 'Guardar y despegar' : 'Guardar mi nave' }}
+            </button>
+            @if (!bienvenida()) {
+              <a routerLink="/juegos" class="btn btn-outline-secondary btn-lg">Volver a los juegos</a>
+            }
+          </div>
+        </div>
+      </form>
+
+      <!-- Account -->
+      <section class="card shadow-sm mb-4" aria-labelledby="account-title">
+        <div class="card-body">
+          <h2 id="account-title" class="h5">Cuenta</h2>
+          <form novalidate class="row g-2 align-items-end" (submit)="changePassword($event)">
+            <input type="text" class="visually-hidden" autocomplete="username" [value]="own.apodo" tabindex="-1" aria-hidden="true" readonly />
+            <div class="col-12 col-sm-5">
+              <label for="new-password" class="form-label">Nueva contraseña</label>
+              <input
+                id="new-password"
+                type="password"
+                class="form-control"
+                autocomplete="new-password"
+                [formField]="passwordForm.password"
+                [class.is-invalid]="passwordForm.password().touched() && passwordForm.password().invalid()"
+                [attr.aria-invalid]="passwordForm.password().touched() && passwordForm.password().invalid()"
+                [attr.aria-describedby]="passwordForm.password().touched() && passwordForm.password().invalid() ? 'new-password-error' : null"
+              />
+              @if (passwordForm.password().touched() && passwordForm.password().invalid()) {
+                <div id="new-password-error" class="invalid-feedback">{{ passwordForm.password().errors()[0].message }}</div>
+              }
+            </div>
+            <div class="col-12 col-sm-5">
+              <label for="repeat-password" class="form-label">Repítela</label>
+              <input
+                id="repeat-password"
+                type="password"
+                class="form-control"
+                autocomplete="new-password"
+                [formField]="passwordForm.repeat"
+                [class.is-invalid]="passwordForm.repeat().touched() && passwordForm.repeat().invalid()"
+                [attr.aria-invalid]="passwordForm.repeat().touched() && passwordForm.repeat().invalid()"
+                [attr.aria-describedby]="passwordForm.repeat().touched() && passwordForm.repeat().invalid() ? 'repeat-password-error' : null"
+              />
+              @if (passwordForm.repeat().touched() && passwordForm.repeat().invalid()) {
+                <div id="repeat-password-error" class="invalid-feedback">{{ passwordForm.repeat().errors()[0].message }}</div>
+              }
+            </div>
+            <div class="col-12 col-sm-2">
+              <button type="submit" class="btn btn-outline-primary w-100" [disabled]="passwordForm().submitting()">Cambiar</button>
+            </div>
+          </form>
+          <div aria-live="polite">
+            @if (passwordMessage(); as m) {
+              <p class="small mt-2 mb-0" [class.text-success]="m.ok" [class.text-danger]="!m.ok" [attr.role]="m.ok ? null : 'alert'">{{ m.text }}</p>
+            }
+          </div>
+          <hr />
+          <p class="small text-body-secondary">
+            Tu sesión se queda en este dispositivo. Para entrar desde otro, elige tu perfil en la portada y escribe tu contraseña.
+          </p>
+          <button type="button" class="btn btn-outline-danger" (click)="logout()">Cerrar sesión en este dispositivo</button>
+        </div>
+      </section>
+    } @else {
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5">Estás jugando como invitado</h2>
+          <p>Los invitados no tienen nave propia. Crea un perfil para personalizar la tuya y que la vean todos.</p>
+          <a routerLink="/" class="btn btn-primary">Crear perfil o elegir el mío</a>
+        </div>
+      </div>
+    }
+  }
+  @default {
+    <div class="d-flex align-items-center gap-2" role="status">
+      <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
+      <span>Cargando tu nave…</span>
+    </div>
+  }
+}

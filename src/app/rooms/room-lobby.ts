@@ -3,13 +3,15 @@ import { AuthService } from '../core/auth.service';
 import { PLAYABLE_GAMES, RoomInfo, RoomPlayer } from '../core/room.model';
 import { roomErrorMessage, RoomService } from '../core/room.service';
 import { RoomQuestions } from './questions/room-questions';
+import { ProfileService } from '../core/profile.service';
+import { CrewHead } from '../shared/crew/crew-head';
 
 const MIN_PLAYERS = 2;
 
 /** Waiting room: invite button, players and (for the host) the start button. */
 @Component({
   selector: 'app-room-lobby',
-  imports: [RoomQuestions],
+  imports: [RoomQuestions, CrewHead],
   template: `
     <div class="card shadow-sm mb-3">
       <div class="card-body p-4 text-center">
@@ -34,11 +36,17 @@ const MIN_PLAYERS = 2;
         <ul class="list-group list-group-flush" aria-live="polite">
           @for (player of players(); track player.user_id) {
             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-              <span>
-                {{ player.apodo }}
-                @if (player.user_id === userId()) {
-                  <span class="text-body-secondary">(tú)</span>
-                }
+              <span class="d-flex align-items-center gap-2">
+                <app-crew-head class="lobby-head" [crew]="profiles.lookFor(player.user_id)" [nickname]="player.apodo" />
+                <span>
+                  {{ player.apodo }}
+                  @if (player.user_id === userId()) {
+                    <span class="text-body-secondary">(tú)</span>
+                  }
+                  @if (!profiles.lookFor(player.user_id)) {
+                    <span class="d-block small text-body-secondary">Invitado</span>
+                  }
+                </span>
               </span>
               @if (player.user_id === hostId()) {
                 <span class="badge text-bg-primary">Anfitrión</span>
@@ -77,6 +85,12 @@ const MIN_PLAYERS = 2;
       <div class="alert alert-danger" role="alert">{{ error() }}</div>
     }
   `,
+  styles: `
+    .lobby-head {
+      flex: 0 0 40px;
+      width: 40px;
+    }
+  `,
 })
 export class RoomLobby {
   private readonly rooms = inject(RoomService);
@@ -87,6 +101,7 @@ export class RoomLobby {
   readonly hostId = input.required<string | null>();
 
   protected readonly userId = inject(AuthService).userId;
+  protected readonly profiles = inject(ProfileService);
   protected readonly error = signal<string | null>(null);
   protected readonly starting = signal(false);
   protected readonly inviteFeedback = signal('');

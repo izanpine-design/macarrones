@@ -1,5 +1,6 @@
-import { afterNextRender, Component, DestroyRef, DOCUMENT, ElementRef, inject, signal } from '@angular/core';
-import { CREW, CrewMember } from '../crew/crew';
+import { afterNextRender, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, signal } from '@angular/core';
+import { ProfileService } from '../../core/profile.service';
+import { Look } from '../crew/look';
 import { PetService } from '../pets/pet.service';
 import { Pet, PET_BY_ID } from '../pets/pets';
 import { SfxService } from '../sfx/sfx.service';
@@ -22,7 +23,7 @@ const TAUNT_MS = 1100;
 
 interface ShipView {
   rid: number;
-  crew: CrewMember;
+  crew: Look;
   pet: Pet | null;
   mode: ShipMode;
   flipped: boolean;
@@ -30,7 +31,7 @@ interface ShipView {
 
 interface Flight {
   rid: number;
-  crew: CrewMember;
+  crew: Look;
   pet: Pet | null;
   el: HTMLElement | null;
   w: number;
@@ -82,6 +83,8 @@ export class RocketSky {
   private readonly window = inject(DOCUMENT).defaultView;
   private readonly petService = inject(PetService);
   private readonly sfx = inject(SfxService);
+  /** The rockets that fly by: the showcase of player profiles (see ProfileService). */
+  private readonly profiles = inject(ProfileService);
 
   protected readonly ships = signal<ShipView[]>([]);
 
@@ -95,12 +98,18 @@ export class RocketSky {
   private last = 0;
   private nextSpawn = 0;
   private nextId = 1;
-  private bag: CrewMember[] = [];
+  private bag: Look[] = [];
   private readonly timers = new Set<number>();
   private readonly still = this.window?.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   constructor() {
     this.petService.skyOpened();
+    void this.profiles.load();
+    // New profiles loaded: start the random order again with them.
+    effect(() => {
+      this.profiles.showcase();
+      this.bag = [];
+    });
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
       const cleanup = this.start();
@@ -189,13 +198,13 @@ export class RocketSky {
     const flying = [...this.flights.values()].filter((f) => !f.falling);
     if (flying.length >= (small ? 2 : 3) || this.width === 0) return;
 
-    const crew = this.nextCrew(new Set(flying.map((f) => f.crew.id)));
+    const crew = this.nextCrew(new Set(flying.map((f) => f.crew.key)));
     if (!crew) return;
     const w = small ? 146 : 214;
     const dir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
     // On phones the nickname card fills the middle: fly over the title instead.
     const path = randomFlightPath(this.width, this.height, w, dir, small ? MOBILE_BAND : [0, 1]);
-    const pet = this.petService.isAboard(crew.mascota) ? (PET_BY_ID.get(crew.mascota) ?? null) : null;
+    const pet = crew.mascota && this.petService.isAboard(crew.mascota) ? (PET_BY_ID.get(crew.mascota) ?? null) : null;
     const flight: Flight = {
       rid: this.nextId++,
       crew,
@@ -225,12 +234,13 @@ export class RocketSky {
     this.ships.update((ships) => [...ships, { rid: flight.rid, crew, pet, mode: 'fly', flipped: dir < 0 }]);
   }
 
-  /** Crew members come out in random order, everybody once before repeating. */
-  private nextCrew(busy: Set<string>): CrewMember | null {
-    for (let tries = 0; tries < CREW.length * 2; tries++) {
-      if (this.bag.length === 0) this.bag = shuffle([...CREW]);
+  /** Rockets come out in random order, everybody once before repeating. */
+  private nextCrew(busy: Set<string>): Look | null {
+    const showcase = this.profiles.showcase();
+    for (let tries = 0; tries < showcase.length * 2; tries++) {
+      if (this.bag.length === 0) this.bag = shuffle([...showcase]);
       const crew = this.bag.pop()!;
-      if (!busy.has(crew.id)) return crew;
+      if (!busy.has(crew.key)) return crew;
       this.bag.unshift(crew);
     }
     return null;
@@ -361,9 +371,11 @@ export class RocketSky {
       [0.86, 0.22, -1],
       [0.16, 0.82, 1],
       [0.84, 0.8, -1],
+      [0.5, 0.12, 1],
+      [0.5, 0.9, -1],
     ] as const;
     const small = this.width < 600;
-    CREW.forEach((crew, i) => {
+    this.profiles.showcase().forEach((crew, i) => {
       const w = small ? 110 : 170;
       const [fx, fy, dir] = spots[i % spots.length];
       this.flights.set(this.nextId, {

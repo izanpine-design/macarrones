@@ -161,3 +161,6 @@
   .drink__pet-sprite, .drink__mug { animation: none; }
   .drink__confetti { display: none; }
 }
+
+/* Own background uploaded by the player (any proportions). */
+.drink__custom-bg { object-fit: cover; }

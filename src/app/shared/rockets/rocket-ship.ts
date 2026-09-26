@@ -1,10 +1,15 @@
 import { Component, computed, input } from '@angular/core';
 import { CrewMember } from '../crew/crew';
+import { Look } from '../crew/look';
 import { Pet } from '../pets/pets';
 import { MIDDLE_FINGER } from '../pixel/pixel-art';
 import { PixelSprite } from '../pixel/pixel-sprite';
 
 export type ShipMode = 'fly' | 'fall' | 'taunt';
+
+/** What the rocket needs: a fixed crew member or any Look (personal pilots). */
+export type ShipLook = Pick<CrewMember, 'nombre' | 'color' | 'colorOscuro' | 'pelo' | 'cabeza' | 'delante' | 'detras'> &
+  Partial<Pick<Look, 'naveImagen'>>;
 
 /**
  * A macaroni rocket: the pasta tube is the pilot's body, their head pops out
@@ -22,7 +27,7 @@ export type ShipMode = 'fly' | 'fall' | 'taunt';
   },
 })
 export class RocketShip {
-  readonly crew = input.required<CrewMember>();
+  readonly crew = input.required<ShipLook>();
   readonly pet = input<Pet | null>(null);
   readonly mode = input<ShipMode>('fly');
   /** The sky mirrors ships flying left; the painted name is flipped back. */

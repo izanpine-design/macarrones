@@ -1,0 +1,50 @@
+.settings {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 992px) {
+  .settings { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+  .settings__preview { position: sticky; top: 1rem; }
+}
+
+.settings__ship {
+  max-width: 340px;
+  margin: .5rem auto 1rem;
+}
+
+.settings__head-row {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+
+.settings__head {
+  flex: 0 0 56px;
+  width: 56px;
+}
+
+.settings__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.settings__color {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 600;
+}
+
+.settings__color input {
+  width: 48px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 8px;
+  background: none;
+}
+
+legend.h5 { float: none; }

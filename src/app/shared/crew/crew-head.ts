@@ -1,6 +1,9 @@
 import { Component, computed, input } from '@angular/core';
 import { CrewMember } from './crew';
 
+/** What the head needs: a crew member or any Look (personal pilots). */
+export type HeadLook = Pick<CrewMember, 'cabeza' | 'pelo'>;
+
 let nextId = 0;
 
 /**
@@ -44,7 +47,7 @@ let nextId = 0;
   `,
 })
 export class CrewHead {
-  readonly crew = input<CrewMember | null>(null);
+  readonly crew = input<HeadLook | null>(null);
   /** Nickname used for the initial when the player is not in the crew. */
   readonly nickname = input('');
 

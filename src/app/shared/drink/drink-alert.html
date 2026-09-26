@@ -25,7 +25,11 @@
       <h2 id="drink-title" class="drink__title">¡A beber, {{ name() }}!</h2>
 
       <div class="drink__photo">
-        <img ngSrc="beber/cuerpo.webp" width="380" height="387" alt="" priority />
+        @if (background(); as bg) {
+          <img class="drink__custom-bg" [src]="bg" width="380" height="387" alt="" />
+        } @else {
+          <img ngSrc="beber/cuerpo.webp" width="380" height="387" alt="" priority />
+        }
         <app-crew-head class="drink__head" [crew]="crew()" [nickname]="c.apodo" />
         @if (pet(); as p) {
           <div class="drink__pet" aria-hidden="true">

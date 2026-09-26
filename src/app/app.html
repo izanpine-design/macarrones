@@ -4,7 +4,11 @@
     @if (player.hasNickname()) {
       <div class="d-flex align-items-center gap-2 site-nav__player">
         <span>{{ player.nickname() }}</span>
-        <a routerLink="/" class="btn btn-sm site-nav__button">Cambiar apodo</a>
+        @if (profiles.own()) {
+          <a routerLink="/ajustes" class="btn btn-sm site-nav__button">Mi nave</a>
+        } @else {
+          <a routerLink="/" class="btn btn-sm site-nav__button">Cambiar</a>
+        }
       </div>
     }
   </div>

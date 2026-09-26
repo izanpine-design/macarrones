@@ -12,35 +12,212 @@
     <p class="welcome-content__intro">Preparaos para despegar. El siguiente cohete puede ser cualquiera de nosotros.</p>
 
     <div class="nickname-card">
-      <h2>¡Bienvenido!</h2>
-      <p>Elige el apodo con el que te verán los demás jugadores.</p>
+      @switch (step()) {
+        @case ('loading') {
+          <h2>¿Quién eres?</h2>
+          <p role="status">Buscando a la tripulación…</p>
+        }
 
-      <form novalidate (submit)="save($event)">
-        <div class="nickname-card__field">
-          <label for="nickname">Apodo</label>
-          <input
-            id="nickname"
-            type="text"
-            autocomplete="nickname"
-            aria-required="true"
-            [formField]="nicknameForm.nickname"
-            [class.is-invalid]="showErrors()"
-            [attr.aria-invalid]="showErrors()"
-            [attr.aria-describedby]="showErrors() ? 'nickname-error' : 'nickname-help'"
-          />
-          @if (showErrors()) {
-            <span id="nickname-error" class="nickname-card__error">
-              {{ nicknameForm.nickname().errors()[0].message }}
-            </span>
+        @case ('signed') {
+          @let me = profiles.own()!;
+          <h2>¡Hola, {{ me.apodo }}!</h2>
+          <div class="profile-hello">
+            <app-crew-head class="profile-hello__head" [crew]="profiles.lookFor(me.user_id)" [nickname]="me.apodo" />
+            <p>Tu nave está lista para despegar.</p>
+          </div>
+          <button type="button" (click)="continueSigned()">Entrar <span aria-hidden="true">→</span></button>
+          <div class="card-links">
+            <a routerLink="/ajustes">Personalizar mi nave</a>
+            <button type="button" class="link-button" [disabled]="busy()" (click)="switchProfile()">
+              No soy {{ me.apodo }}
+            </button>
+          </div>
+        }
+
+        @case ('pick') {
+          <h2>¿Quién eres?</h2>
+          <p>Elige tu perfil para entrar con tu nave.</p>
+
+          @if (profiles.error(); as loadError) {
+            <p class="nickname-card__error" role="alert">{{ loadError }}</p>
+            <button type="button" class="link-button" (click)="retry()">Reintentar</button>
+          } @else if (profiles.profiles().length === 0) {
+            <p class="nickname-card__help">Todavía no hay perfiles. ¡Crea el primero!</p>
           } @else {
-            <span id="nickname-help" class="nickname-card__help">
-              Entre {{ minLength }} y {{ maxLength }} caracteres.
-            </span>
+            <ul class="profile-grid">
+              @for (profile of profiles.profiles(); track profile.user_id) {
+                <li>
+                  <button type="button" class="profile-chip" (click)="pick(profile)">
+                    <app-crew-head class="profile-chip__head" [crew]="profiles.lookFor(profile.user_id)" [nickname]="profile.apodo" />
+                    <span>{{ profile.apodo }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
           }
-        </div>
 
-        <button type="submit">Entrar <span aria-hidden="true">→</span></button>
-      </form>
+          <button type="button" (click)="show('create')">Soy nuevo: crear perfil <span aria-hidden="true">✨</span></button>
+          <div class="card-links">
+            <button type="button" class="link-button" (click)="show('guest')">Entrar como invitado</button>
+          </div>
+        }
+
+        @case ('password') {
+          @let profile = picked()!;
+          <h2>Hola, {{ profile.apodo }}</h2>
+          <div class="profile-hello">
+            <app-crew-head class="profile-hello__head" [crew]="profiles.lookFor(profile.user_id)" [nickname]="profile.apodo" />
+            <p>Escribe tu contraseña para entrar con tu nave.</p>
+          </div>
+
+          <form novalidate (submit)="login($event)">
+            <!-- Lets password managers pair the password with the profile -->
+            <input type="text" class="visually-hidden" autocomplete="username" [value]="profile.apodo" tabindex="-1" aria-hidden="true" readonly />
+            <div class="nickname-card__field">
+              <label for="login-password">Contraseña</label>
+              <input
+                id="login-password"
+                type="password"
+                autocomplete="current-password"
+                aria-required="true"
+                [formField]="loginForm.password"
+                [class.is-invalid]="showLoginErrors() || !!error()"
+                [attr.aria-invalid]="showLoginErrors() || !!error()"
+                [attr.aria-describedby]="showLoginErrors() || error() ? 'login-error' : null"
+              />
+              @if (showLoginErrors()) {
+                <span id="login-error" class="nickname-card__error">{{ loginForm.password().errors()[0].message }}</span>
+              } @else if (error()) {
+                <span id="login-error" class="nickname-card__error" role="alert">{{ error() }}</span>
+              }
+            </div>
+            <button type="submit" [disabled]="loginForm().submitting()">Entrar <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="card-links">
+            <button type="button" class="link-button" (click)="show('pick')">← No soy {{ profile.apodo }}</button>
+          </div>
+          <p class="nickname-card__help">¿Has olvidado la contraseña? Pide a quien administra la web que te la cambie.</p>
+        }
+
+        @case ('create') {
+          <h2>Crear perfil</h2>
+          <p>Tu nave la verán todos. Luego podrás personalizarla entera.</p>
+
+          <form novalidate (submit)="create($event)">
+            <div class="nickname-card__field">
+              <label for="create-apodo">Apodo</label>
+              <input
+                id="create-apodo"
+                type="text"
+                autocomplete="username"
+                aria-required="true"
+                [formField]="createForm.apodo"
+                [class.is-invalid]="createForm.apodo().touched() && createForm.apodo().invalid()"
+                [attr.aria-invalid]="createForm.apodo().touched() && createForm.apodo().invalid()"
+                [attr.aria-describedby]="createForm.apodo().touched() && createForm.apodo().invalid() ? 'create-apodo-error' : 'create-apodo-help'"
+              />
+              @if (createForm.apodo().touched() && createForm.apodo().invalid()) {
+                <span id="create-apodo-error" class="nickname-card__error">{{ createForm.apodo().errors()[0].message }}</span>
+              } @else {
+                <span id="create-apodo-help" class="nickname-card__help">Entre {{ minLength }} y {{ maxLength }} caracteres.</span>
+              }
+            </div>
+
+            <fieldset class="template-picker">
+              <legend>Nave de partida</legend>
+              <div class="template-picker__options">
+                @for (member of templates; track member.id) {
+                  <label class="template-option" [style.--template]="member.color">
+                    <input type="radio" name="template" [checked]="template() === member.id" (change)="template.set(member.id)" />
+                    <span>Como {{ member.nombre }}</span>
+                  </label>
+                }
+                <label class="template-option" style="--template: #8a5cff">
+                  <input type="radio" name="template" [checked]="template() === 'blank'" (change)="template.set('blank')" />
+                  <span>En blanco</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="nickname-card__field">
+              <label for="create-password">Contraseña</label>
+              <input
+                id="create-password"
+                type="password"
+                autocomplete="new-password"
+                aria-required="true"
+                [formField]="createForm.password"
+                [class.is-invalid]="createForm.password().touched() && createForm.password().invalid()"
+                [attr.aria-invalid]="createForm.password().touched() && createForm.password().invalid()"
+                [attr.aria-describedby]="createForm.password().touched() && createForm.password().invalid() ? 'create-password-error' : 'create-password-help'"
+              />
+              @if (createForm.password().touched() && createForm.password().invalid()) {
+                <span id="create-password-error" class="nickname-card__error">{{ createForm.password().errors()[0].message }}</span>
+              } @else {
+                <span id="create-password-help" class="nickname-card__help">Mínimo {{ passwordMinLength }} caracteres. La necesitarás para entrar desde otro móvil.</span>
+              }
+            </div>
+
+            <div class="nickname-card__field">
+              <label for="create-repeat">Repite la contraseña</label>
+              <input
+                id="create-repeat"
+                type="password"
+                autocomplete="new-password"
+                aria-required="true"
+                [formField]="createForm.repeat"
+                [class.is-invalid]="createForm.repeat().touched() && createForm.repeat().invalid()"
+                [attr.aria-invalid]="createForm.repeat().touched() && createForm.repeat().invalid()"
+                [attr.aria-describedby]="createForm.repeat().touched() && createForm.repeat().invalid() ? 'create-repeat-error' : null"
+              />
+              @if (createForm.repeat().touched() && createForm.repeat().invalid()) {
+                <span id="create-repeat-error" class="nickname-card__error">{{ createForm.repeat().errors()[0].message }}</span>
+              }
+            </div>
+
+            @if (error()) {
+              <p class="nickname-card__error" role="alert">{{ error() }}</p>
+            }
+            <button type="submit" [disabled]="createForm().submitting()">Crear y personalizar <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="card-links">
+            <button type="button" class="link-button" (click)="show('pick')">← Volver</button>
+          </div>
+        }
+
+        @case ('guest') {
+          <h2>Entrar como invitado</h2>
+          <p>Juegas sin nave propia: los demás te verán con la inicial de tu apodo.</p>
+
+          <form novalidate (submit)="enterAsGuest($event)">
+            <div class="nickname-card__field">
+              <label for="nickname">Apodo</label>
+              <input
+                id="nickname"
+                type="text"
+                autocomplete="nickname"
+                aria-required="true"
+                [formField]="guestForm.nickname"
+                [class.is-invalid]="showGuestErrors()"
+                [attr.aria-invalid]="showGuestErrors()"
+                [attr.aria-describedby]="showGuestErrors() ? 'nickname-error' : 'nickname-help'"
+              />
+              @if (showGuestErrors()) {
+                <span id="nickname-error" class="nickname-card__error">{{ guestForm.nickname().errors()[0].message }}</span>
+              } @else {
+                <span id="nickname-help" class="nickname-card__help">Entre {{ minLength }} y {{ maxLength }} caracteres.</span>
+              }
+            </div>
+            @if (error()) {
+              <p class="nickname-card__error" role="alert">{{ error() }}</p>
+            }
+            <button type="submit" [disabled]="guestForm().submitting()">Entrar <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="card-links">
+            <button type="button" class="link-button" (click)="show('pick')">← Volver</button>
+          </div>
+        }
+      }
     </div>
   </div>
 

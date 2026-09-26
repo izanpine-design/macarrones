@@ -1,21 +1,25 @@
-import { computed, Service, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
+import { ProfileService } from './profile.service';
 
 const STORAGE_KEY = 'macarrones.nickname';
 
 /**
- * Nickname of the player on this device. There is no login: it is kept in
- * localStorage so it survives reloads.
+ * Name the player uses in rooms: their profile's nickname when signed in to a
+ * profile, or the guest nickname kept in localStorage on this device.
  */
 @Service()
 export class PlayerService {
-  private readonly _nickname = signal(readStoredNickname());
+  private readonly profiles = inject(ProfileService);
+  private readonly _guestNickname = signal(readStoredNickname());
 
-  readonly nickname = this._nickname.asReadonly();
-  readonly hasNickname = computed(() => this._nickname() !== '');
+  readonly guestNickname = this._guestNickname.asReadonly();
+  readonly nickname = computed(() => this.profiles.own()?.apodo ?? this._guestNickname());
+  readonly hasNickname = computed(() => this.nickname() !== '');
 
+  /** Guest nickname. */
   setNickname(nickname: string): void {
     const trimmed = nickname.trim();
-    this._nickname.set(trimmed);
+    this._guestNickname.set(trimmed);
     try {
       localStorage.setItem(STORAGE_KEY, trimmed);
     } catch {
