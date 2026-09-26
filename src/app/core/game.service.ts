@@ -27,4 +27,19 @@ export class GameService {
       questionCount: preguntas[0]?.count ?? 0,
     }));
   }
+
+  /** A single game by id, or null if it does not exist. */
+  async getGame(id: number): Promise<Game | null> {
+    const { data, error } = await this.supabase
+      .from('juegos')
+      .select('id, nombre')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data as Game | null;
+  }
 }

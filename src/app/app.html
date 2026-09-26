@@ -1,12 +1,15 @@
 <header class="navbar bg-primary mb-4">
   <div class="container">
     <h1 class="navbar-brand text-white fw-bold m-0">Macarrones</h1>
+    @if (player.hasNickname()) {
+      <div class="d-flex align-items-center gap-2 text-white">
+        <span>{{ player.nickname() }}</span>
+        <a routerLink="/" class="btn btn-sm btn-light">Cambiar apodo</a>
+      </div>
+    }
   </div>
 </header>
 
 <main class="container pb-4">
-  <!-- TEMPORARY: Supabase connection test -->
-  <app-supabase-test />
-
   <router-outlet />
 </main>

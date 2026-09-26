@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { SupabaseTest } from './supabase-test/supabase-test'; // TEMPORARY
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { PlayerService } from './core/player.service';
 
 @Component({
-  imports: [RouterOutlet, SupabaseTest], // TEMPORARY: SupabaseTest
+  imports: [RouterLink, RouterOutlet],
   selector: 'app-root',
   templateUrl: './app.html',
 })
-export class App {}
+export class App {
+  protected readonly player = inject(PlayerService);
+}
