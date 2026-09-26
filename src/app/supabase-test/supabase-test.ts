@@ -2,7 +2,13 @@
 // the <app-supabase-test /> tag (and its import) from app.html / app.ts.
 import { Component, inject, signal } from '@angular/core';
 import { SupabaseService } from '../core/supabase.service';
-import { Question } from '../core/question.model';
+import { Game, Level, Question } from '../core/question.model';
+
+/** Question with its game and level names joined through the foreign keys. */
+type QuestionWithNames = Question & {
+  juegos: Pick<Game, 'nombre'> | null;
+  niveles: Pick<Level, 'nombre'> | null;
+};
 
 @Component({
   selector: 'app-supabase-test',
@@ -17,7 +23,12 @@ import { Question } from '../core/question.model';
         <p>{{ questions().length }} preguntas recibidas:</p>
         <ul>
           @for (question of questions(); track question.id) {
-            <li>[{{ question.juego }}{{ question.nivel ? ' · ' + question.nivel : '' }}] {{ question.texto }}</li>
+            <li>
+              [{{ question.juegos?.nombre }}{{ question.tipo ? ' · ' + question.tipo : '' }}{{
+                question.niveles ? ' · ' + question.niveles.nombre : ''
+              }}]
+              {{ question.texto }}
+            </li>
           }
         </ul>
       }
@@ -43,21 +54,24 @@ export class SupabaseTest {
 
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
-  protected readonly questions = signal<Question[]>([]);
+  protected readonly questions = signal<QuestionWithNames[]>([]);
 
   constructor() {
     void this.load();
   }
 
   private async load(): Promise<void> {
-    const { data, error } = await this.supabase.from('preguntas').select('*').order('id');
+    const { data, error } = await this.supabase
+      .from('preguntas')
+      .select('*, juegos(nombre), niveles(nombre)')
+      .order('id');
 
     if (error) {
       console.error('[Supabase test] Error:', error);
       this.error.set(error.message);
     } else {
       console.log('[Supabase test] Preguntas:', data);
-      this.questions.set(data as Question[]);
+      this.questions.set(data as QuestionWithNames[]);
     }
     this.loading.set(false);
   }
