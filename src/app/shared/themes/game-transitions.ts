@@ -43,10 +43,12 @@ export function gameViewTransition({ transition, from, to }: ViewTransitionInfo)
   const root = document.documentElement;
   root.dataset['vt'] = direction;
   root.dataset['vtStyle'] = style;
-  transition.finished.finally(() => {
+  const clear = (): void => {
     delete root.dataset['vt'];
     delete root.dataset['vtStyle'];
-  });
+  };
+  // Also when the transition is aborted (hidden tab, quick navigation): no unhandled rejection.
+  transition.finished.then(clear, clear);
 }
 
 function urlOf(snapshot: ActivatedRouteSnapshot): string {
