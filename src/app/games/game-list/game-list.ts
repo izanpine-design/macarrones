@@ -1,11 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { GameService, GameSummary } from '../../core/game.service';
 import { PLAYABLE_GAMES } from '../../core/room.model';
+import { GameTube } from './game-tube';
 
 @Component({
   selector: 'app-game-list',
-  imports: [RouterLink],
+  imports: [GameTube],
   template: `
     <section class="page-intro" aria-labelledby="games-title">
       <p class="page-intro__eyebrow">El menú de la tripulación</p>
@@ -27,38 +27,14 @@ import { PLAYABLE_GAMES } from '../../core/room.model';
     } @else {
       @for (section of sections(); track section.title) {
         @if (section.games.length > 0) {
-          <section class="mb-4" [attr.aria-labelledby]="section.id">
-            <h2 [id]="section.id" class="h5 mb-3">
+          <section class="menu-section" [attr.aria-labelledby]="section.id">
+            <h2 [id]="section.id" class="menu-section__title">
               <span aria-hidden="true">{{ section.icon }}</span> {{ section.title }}
             </h2>
-            <ul class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 list-unstyled">
+            <ul class="menu">
               @for (game of section.games; track game.id) {
-                <li class="col">
-                  <article class="card h-100 shadow-sm game-card" [attr.data-game]="game.clave">
-                    <div class="card-body d-flex flex-column">
-                      <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                        <h3 class="card-title h5 mb-0">
-                          <a
-                            [routerLink]="['/juegos', game.id]"
-                            class="stretched-link link-body-emphasis text-decoration-none"
-                          >
-                            {{ game.nombre }}
-                          </a>
-                        </h3>
-                        @if (!isPlayable(game)) {
-                          <span class="badge text-bg-secondary flex-shrink-0">Próximamente</span>
-                        }
-                      </div>
-                      @if (game.descripcion) {
-                        <p class="card-text text-body-secondary small mb-2">{{ game.descripcion }}</p>
-                      }
-                      @if (game.questionCount > 0) {
-                        <p class="card-text small text-body-secondary mt-auto mb-0">
-                          {{ game.questionCount }} {{ game.questionCount === 1 ? 'pregunta' : 'preguntas' }}
-                        </p>
-                      }
-                    </div>
-                  </article>
+                <li>
+                  <app-game-tube [game]="game" [playable]="isPlayable(game)" />
                 </li>
               }
             </ul>
@@ -67,23 +43,7 @@ import { PLAYABLE_GAMES } from '../../core/room.model';
       }
     }
   `,
-  styles: `
-    .game-card {
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .game-card:hover,
-    .game-card:focus-within {
-      transform: translateY(-2px);
-      box-shadow: var(--bs-box-shadow) !important;
-    }
-    .game-card:focus-within {
-      outline: 3px solid var(--bs-primary);
-      outline-offset: 2px;
-    }
-    .game-card a:focus-visible {
-      outline: none;
-    }
-  `,
+  styleUrl: './game-list.css',
 })
 export class GameList {
   private readonly gameService = inject(GameService);

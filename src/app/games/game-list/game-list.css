@@ -1,0 +1,35 @@
+:host { display: block; }
+
+.menu-section { margin-bottom: 2.6rem; }
+
+.menu-section__title {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin: 0 0 1.3rem;
+  color: #392638;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+/* A little line of pasta after the heading. */
+.menu-section__title::after {
+  height: 4px;
+  flex: 1;
+  border-radius: 4px;
+  background: repeating-linear-gradient(90deg, #e9b36a 0 16px, transparent 16px 24px);
+  content: '';
+  opacity: .75;
+}
+
+.menu {
+  display: grid;
+  gap: 1.5rem 1.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 992px) {
+  .menu { grid-template-columns: 1fr 1fr; }
+}
