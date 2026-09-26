@@ -1,13 +1,5 @@
 @for (pet of pets; track pet.id) {
-  <div
-    class="pet"
-    [attr.data-pet]="pet.id"
-    [class.pet--hidden]="modes()[pet.id] === 'hidden'"
-    [class.pet--drop]="modes()[pet.id] === 'drop'"
-    [class.pet--sleep]="modes()[pet.id] === 'sleep'"
-    [class.pet--hop]="hopping() === pet.id"
-    (pointerdown)="pat(pet.id)"
-  >
+  <div class="pet" [attr.data-pet]="pet.id" [attr.data-mode]="modes()[pet.id]" (pointerdown)="pat(pet.id)">
     @if (modes()[pet.id] === 'drop') {
       <app-pixel-sprite class="pet__chute" [frame]="parachute" [palette]="pet.chutePalette" />
     }
@@ -15,8 +7,20 @@
       <app-pixel-sprite [frame]="pet.art.frames[poses()[pet.id]]" [palette]="pet.art.palette" />
     </div>
     <span class="pet__zzz">z<span>z</span><span>z</span></span>
-    @if (hopping() === pet.id) {
-      <span class="pet__heart">♥ {{ pet.nombre }}</span>
+    @if (bubbles()[pet.id]; as bubble) {
+      <span class="pet__bubble">{{ bubble }}</span>
     }
+  </div>
+}
+
+<!-- Cartoon brawl: a spinning dust cloud with bits flying out -->
+@if (brawl(); as b) {
+  <div class="brawl" [style.left.px]="b.x" [style.top.px]="b.y">
+    <span class="brawl__cloud"></span>
+    <span class="brawl__bit">💥</span>
+    <span class="brawl__bit">⭐</span>
+    <span class="brawl__bit">🐾</span>
+    <span class="brawl__bit">💢</span>
+    <span class="brawl__bit">✨</span>
   </div>
 }

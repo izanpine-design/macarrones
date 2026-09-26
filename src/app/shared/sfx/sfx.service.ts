@@ -2,7 +2,7 @@ import { DOCUMENT, inject, Service, signal } from '@angular/core';
 
 const STORAGE_KEY = 'macarrones.sonido';
 
-export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers' | 'beep' | 'go' | 'launch' | 'warp' | 'arrive' | 'hiss';
+export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers' | 'beep' | 'go' | 'launch' | 'warp' | 'arrive' | 'hiss' | 'woof' | 'scuffle';
 
 /**
  * Tiny synthesised sound effects (Web Audio, no files to download).
@@ -74,6 +74,14 @@ export class SfxService {
       case 'arrive':
         [523, 659, 784].forEach((f) => this.tone(ctx, 'triangle', f, f, t, 0.9, 0.09));
         this.tone(ctx, 'triangle', 1047, 1047, t + 0.12, 0.8, 0.07);
+        break;
+      case 'woof':
+        this.tone(ctx, 'square', 520, 260, t, 0.12, 0.09);
+        this.tone(ctx, 'square', 560, 280, t + 0.18, 0.12, 0.09);
+        break;
+      case 'scuffle':
+        // A cartoon fight: a quick string of thumps and scratches.
+        for (let i = 0; i < 9; i++) this.noiseBurst(ctx, t + i * 0.17 + Math.random() * 0.05, 0.12, 0.3, 2500, 300);
         break;
       case 'hiss':
         this.noiseBurst(ctx, t, 0.45, 0.25, 5000, 2500);
