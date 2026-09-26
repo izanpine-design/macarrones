@@ -1,7 +1,11 @@
 /** Row of the `juegos` table. */
 export interface Game {
   id: number;
+  clave: string;
   nombre: string;
+  descripcion: string | null;
+  con_alcohol: boolean;
+  orden: number;
 }
 
 /** Row of the `niveles` table. */

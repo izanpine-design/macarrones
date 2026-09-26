@@ -6,9 +6,25 @@ export type RoomStatus = 'esperando' | 'jugando' | 'terminada';
 export interface OpenRoom {
   codigo: string;
   anfitrion: string | null;
+  nivel: string;
   jugadores: number;
   tiene_password: boolean;
   created_at: string;
+}
+
+/** Question pack (row of `lotes`) with its question counts. */
+export interface QuestionPack {
+  id: number;
+  nombre: string;
+  total: number;
+  verdades: number;
+  retos: number;
+}
+
+/** Question to add to a pack. `tipo` is only used in "Verdad o reto". */
+export interface NewQuestion {
+  texto: string;
+  tipo: QuestionType | null;
 }
 
 /** Row returned by the `info_sala` function. */
@@ -18,6 +34,12 @@ export interface RoomInfo {
   juego_id: number;
   juego: string;
   juego_clave: string | null;
+  nivel_id: number;
+  nivel: string;
+  /** Question pack chosen by the host (null until they choose one). */
+  lote_id: number | null;
+  lote: string | null;
+  lote_preguntas: number;
   anfitrion: string | null;
   jugadores: number;
   tiene_password: boolean;
@@ -63,3 +85,7 @@ export const ROOM_PASSWORD_MIN_LENGTH = 4;
 export const ROOM_PASSWORD_MAX_LENGTH = 50;
 export const QUESTION_MIN_LENGTH = 3;
 export const QUESTION_MAX_LENGTH = 300;
+export const PACK_NAME_MIN_LENGTH = 2;
+export const PACK_NAME_MAX_LENGTH = 40;
+/** Games whose questions are split into verdad / reto. */
+export const GAMES_WITH_QUESTION_TYPE = ['verdad_o_reto'];

@@ -22,6 +22,12 @@ export type RoomErrorCode =
   | 'NOT_YOUR_TURN'
   | 'NO_QUESTIONS'
   | 'INVALID_QUESTION'
+  | 'INVALID_QUESTION_TYPE'
+  | 'LEVEL_NOT_FOUND'
+  | 'LOT_NOT_FOUND'
+  | 'INVALID_LOT_NAME'
+  | 'LOT_NAME_TAKEN'
+  | 'NO_LOT_SELECTED'
   | 'UNKNOWN';
 
 const ERROR_MESSAGES: Record<RoomErrorCode, string> = {
@@ -41,6 +47,12 @@ const ERROR_MESSAGES: Record<RoomErrorCode, string> = {
   NOT_YOUR_TURN: 'No es tu turno.',
   NO_QUESTIONS: 'No hay preguntas de este tipo. Escríbela tú.',
   INVALID_QUESTION: 'La pregunta debe tener entre 3 y 300 caracteres.',
+  INVALID_QUESTION_TYPE: 'Cada pregunta tiene que ser "verdad" o "reto".',
+  LEVEL_NOT_FOUND: 'Esa categoría no existe.',
+  LOT_NOT_FOUND: 'Ese lote no existe o no es de esta categoría.',
+  INVALID_LOT_NAME: 'El nombre del lote debe tener entre 2 y 40 caracteres.',
+  LOT_NAME_TAKEN: 'Ya hay un lote con ese nombre en esta categoría.',
+  NO_LOT_SELECTED: 'Elige primero un lote de preguntas.',
   UNKNOWN: 'Ha ocurrido un error inesperado.',
 };
 
@@ -69,11 +81,12 @@ export class RoomService {
   private readonly auth = inject(AuthService);
   private readonly player = inject(PlayerService);
 
-  /** Creates a room for a game, with the caller as host. Returns its code. */
-  async createRoom(gameId: number, password: string | null): Promise<string> {
+  /** Creates a room of a game and category, with the caller as host. Returns its code. */
+  async createRoom(gameId: number, levelId: number, password: string | null): Promise<string> {
     await this.auth.ensureSignedIn();
     const { data, error } = await this.supabase.rpc('crear_sala', {
       p_juego_id: gameId,
+      p_nivel_id: levelId,
       p_apodo: this.player.nickname(),
       p_password: password,
     });

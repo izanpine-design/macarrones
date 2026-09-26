@@ -1,6 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { GameService, GameSummary } from '../../core/game.service';
+import { PLAYABLE_GAMES } from '../../core/room.model';
 
 @Component({
   selector: 'app-game-list',
@@ -20,24 +21,46 @@ import { GameService, GameSummary } from '../../core/game.service';
     } @else if (games().length === 0) {
       <p class="text-body-secondary">Todavía no hay juegos disponibles.</p>
     } @else {
-      <ul class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 list-unstyled">
-        @for (game of games(); track game.id) {
-          <li class="col">
-            <article class="card h-100 shadow-sm game-card">
-              <div class="card-body">
-                <h3 class="card-title h5">
-                  <a [routerLink]="['/juegos', game.id]" class="stretched-link link-body-emphasis text-decoration-none">
-                    {{ game.nombre }}
-                  </a>
-                </h3>
-                <p class="card-text text-body-secondary mb-0">
-                  {{ game.questionCount }} {{ game.questionCount === 1 ? 'pregunta' : 'preguntas' }}
-                </p>
-              </div>
-            </article>
-          </li>
+      @for (section of sections(); track section.title) {
+        @if (section.games.length > 0) {
+          <section class="mb-4" [attr.aria-labelledby]="section.id">
+            <h3 [id]="section.id" class="h5 mb-3">
+              <span aria-hidden="true">{{ section.icon }}</span> {{ section.title }}
+            </h3>
+            <ul class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 list-unstyled">
+              @for (game of section.games; track game.id) {
+                <li class="col">
+                  <article class="card h-100 shadow-sm game-card">
+                    <div class="card-body d-flex flex-column">
+                      <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <h4 class="card-title h5 mb-0">
+                          <a
+                            [routerLink]="['/juegos', game.id]"
+                            class="stretched-link link-body-emphasis text-decoration-none"
+                          >
+                            {{ game.nombre }}
+                          </a>
+                        </h4>
+                        @if (!isPlayable(game)) {
+                          <span class="badge text-bg-secondary flex-shrink-0">Próximamente</span>
+                        }
+                      </div>
+                      @if (game.descripcion) {
+                        <p class="card-text text-body-secondary small mb-2">{{ game.descripcion }}</p>
+                      }
+                      @if (game.questionCount > 0) {
+                        <p class="card-text small text-body-secondary mt-auto mb-0">
+                          {{ game.questionCount }} {{ game.questionCount === 1 ? 'pregunta' : 'preguntas' }}
+                        </p>
+                      }
+                    </div>
+                  </article>
+                </li>
+              }
+            </ul>
+          </section>
         }
-      </ul>
+      }
     }
   `,
   styles: `
@@ -64,6 +87,25 @@ export class GameList {
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly games = signal<GameSummary[]>([]);
+
+  protected readonly sections = computed(() => [
+    {
+      id: 'games-alcohol',
+      icon: '🍻',
+      title: 'Con alcohol',
+      games: this.games().filter((game) => game.con_alcohol),
+    },
+    {
+      id: 'games-no-alcohol',
+      icon: '🧃',
+      title: 'Sin alcohol',
+      games: this.games().filter((game) => !game.con_alcohol),
+    },
+  ]);
+
+  protected isPlayable(game: GameSummary): boolean {
+    return PLAYABLE_GAMES.includes(game.clave);
+  }
 
   constructor() {
     void this.load();

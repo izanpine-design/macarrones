@@ -2,12 +2,14 @@ import { Component, computed, DOCUMENT, inject, input, signal } from '@angular/c
 import { AuthService } from '../core/auth.service';
 import { PLAYABLE_GAMES, RoomInfo, RoomPlayer } from '../core/room.model';
 import { roomErrorMessage, RoomService } from '../core/room.service';
+import { RoomQuestions } from './questions/room-questions';
 
 const MIN_PLAYERS = 2;
 
 /** Waiting room: invite button, players and (for the host) the start button. */
 @Component({
   selector: 'app-room-lobby',
+  imports: [RoomQuestions],
   template: `
     <div class="card shadow-sm mb-3">
       <div class="card-body p-4 text-center">
@@ -47,14 +49,16 @@ const MIN_PLAYERS = 2;
       </div>
     </section>
 
+    <app-room-questions [room]="room()" [isHost]="isHost()" />
+
     @if (!isPlayable()) {
       <p class="text-body-secondary text-center">Este juego todavía no se puede jugar. ¡Pronto!</p>
     } @else if (isHost()) {
       <button
         type="button"
         class="btn btn-success btn-lg w-100 mb-2"
-        [disabled]="!enoughPlayers() || starting()"
-        [attr.aria-describedby]="enoughPlayers() ? null : 'start-help'"
+        [disabled]="startBlocker() !== null || starting()"
+        [attr.aria-describedby]="startBlocker() ? 'start-help' : null"
         (click)="start()"
       >
         @if (starting()) {
@@ -62,10 +66,8 @@ const MIN_PLAYERS = 2;
         }
         Empezar partida
       </button>
-      @if (!enoughPlayers()) {
-        <p id="start-help" class="small text-body-secondary text-center">
-          Hacen falta al menos {{ minPlayers }} jugadores. ¡Invita a alguien!
-        </p>
+      @if (startBlocker(); as blocker) {
+        <p id="start-help" class="small text-body-secondary text-center">{{ blocker }}</p>
       }
     } @else {
       <p class="text-body-secondary text-center" role="status">Esperando a que el anfitrión empiece la partida…</p>
@@ -84,7 +86,6 @@ export class RoomLobby {
   readonly players = input.required<RoomPlayer[]>();
   readonly hostId = input.required<string | null>();
 
-  protected readonly minPlayers = MIN_PLAYERS;
   protected readonly userId = inject(AuthService).userId;
   protected readonly error = signal<string | null>(null);
   protected readonly starting = signal(false);
@@ -92,7 +93,16 @@ export class RoomLobby {
 
   protected readonly isHost = computed(() => this.hostId() !== null && this.hostId() === this.userId());
   protected readonly isPlayable = computed(() => PLAYABLE_GAMES.includes(this.room().juego_clave ?? ''));
-  protected readonly enoughPlayers = computed(() => this.players().length >= MIN_PLAYERS);
+  /** Why the game cannot start yet, or null if it can. */
+  protected readonly startBlocker = computed(() => {
+    if (this.players().length < MIN_PLAYERS) {
+      return `Hacen falta al menos ${MIN_PLAYERS} jugadores. ¡Invita a alguien!`;
+    }
+    if (!this.room().lote_id) {
+      return 'Elige un lote de preguntas (o crea uno) para empezar.';
+    }
+    return null;
+  });
   protected readonly spelledCode = computed(() => this.room().codigo.split('').join(' '));
 
   protected async start(): Promise<void> {

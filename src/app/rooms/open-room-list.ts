@@ -32,6 +32,7 @@ import { RoomService } from '../core/room.service';
                     Sala de {{ room.anfitrion ?? 'alguien' }}
                   </a>
                   <div class="small text-body-secondary">
+                    <span class="text-capitalize">{{ room.nivel }}</span> ·
                     {{ room.jugadores }} {{ room.jugadores === 1 ? 'jugador' : 'jugadores' }}
                     · <span class="font-monospace">{{ room.codigo }}</span>
                   </div>

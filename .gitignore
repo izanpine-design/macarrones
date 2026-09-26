@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Supabase SQL scripts (run by hand in the SQL Editor, kept out of the repo)
+supabase/*.sql
