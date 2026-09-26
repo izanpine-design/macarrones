@@ -143,6 +143,20 @@
         </g>
         <circle cx="199" cy="63" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
       }
+      @case ('pepe') {
+        <path d="M172 82Q200 80 199 66" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
+        <g class="ship__pepe">
+          <path d="M191 62Q190 76 203 76Q216 76 215 62Z" fill="#2f63c9" stroke="#14254f" stroke-width="1.5" />
+          <ellipse cx="203" cy="52" rx="15" ry="11.5" fill="#5aa33e" stroke="#1f4d17" stroke-width="1.5" />
+          <ellipse cx="196.5" cy="45" rx="6" ry="5" fill="#fff" stroke="#1f4d17" stroke-width="1.2" />
+          <ellipse cx="209.5" cy="44.5" rx="6" ry="5" fill="#fff" stroke="#1f4d17" stroke-width="1.2" />
+          <circle cx="197" cy="47.3" r="2" fill="#2b1a14" />
+          <circle cx="210" cy="46.8" r="2" fill="#2b1a14" />
+          <path d="M190.5 44.6Q196.5 38.5 202.5 44.4ZM203.5 44Q209.5 38 215.5 44Z" fill="#5aa33e" stroke="#1f4d17" stroke-width="1.2" stroke-linejoin="round" />
+          <path d="M193 57.5Q203 61.5 214 56.5" fill="none" stroke="#a8483a" stroke-width="3.2" stroke-linecap="round" />
+        </g>
+        <circle cx="199" cy="67" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
+      }
       @default {
         <path d="M172 80Q194 76 205 63" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
         <circle cx="206" cy="61" r="8" fill="#fff" stroke="#1d1626" stroke-width="2" />
@@ -154,9 +168,9 @@
   <!-- Vape clouds and song notes drift back from the mouth -->
   @if (c.delante === 'vaper' && mode() !== 'fall') {
     <g class="ship__puffs" fill="#f4f1ff" fill-opacity=".85">
-      <circle cx="180" cy="46" r="8" />
-      <circle cx="180" cy="46" r="10" />
-      <circle cx="180" cy="46" r="7" />
+      @for (r of puffs; track $index) {
+        <circle cx="180" cy="46" [attr.r]="r" />
+      }
     </g>
   }
   @if (c.delante === 'micro' && mode() !== 'fall') {

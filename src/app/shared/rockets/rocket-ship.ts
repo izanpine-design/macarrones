@@ -32,6 +32,8 @@ export class RocketShip {
 
   protected readonly middleFinger = MIDDLE_FINGER;
   protected readonly ridges = [78, 92, 106, 120, 134, 148, 162];
+  /** Vape clouds: radius of each puff (their drift is set in CSS). */
+  protected readonly puffs = [9, 11, 8, 12, 10, 9, 13, 8, 11, 10];
 
   protected readonly ids = computed(() => {
     const id = this.uid();

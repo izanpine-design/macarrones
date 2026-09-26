@@ -4,8 +4,8 @@
   position: relative;
   display: grid;
   width: 100%;
-  min-height: min(840px, calc(100vh - 68px));
-  min-height: min(840px, calc(100svh - 68px));
+  min-height: calc(100vh - 68px);
+  min-height: calc(100svh - 68px);
   padding: 3rem 1rem 4rem;
   place-items: center;
   overflow: hidden;
@@ -199,8 +199,6 @@
 
 @media (max-width: 600px) {
   .welcome-hero {
-    min-height: min(820px, calc(100vh - 60px));
-    min-height: min(820px, calc(100svh - 60px));
     padding: 2.5rem 1.1rem 3.5rem;
   }
   .welcome-content__eyebrow { font-size: .66rem; letter-spacing: .13em; }

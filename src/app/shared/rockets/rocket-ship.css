@@ -62,11 +62,21 @@
 .ship__puffs circle {
   transform-origin: 180px 46px;
   opacity: 0;
-  animation: puff 3.6s ease-out infinite;
+  animation: puff 2.6s ease-out infinite;
 }
 
-.ship__puffs circle:nth-child(2) { animation-delay: .25s; }
-.ship__puffs circle:nth-child(3) { animation-delay: .5s; }
+/* A constant, billowing cloud: every puff drifts its own way. */
+.ship__puffs circle:nth-child(1) { --dx: 18px; --dy: -44px; }
+.ship__puffs circle:nth-child(2) { --dx: 34px; --dy: -28px; animation-delay: .26s; }
+.ship__puffs circle:nth-child(3) { --dx: 6px; --dy: -58px; animation-delay: .52s; }
+.ship__puffs circle:nth-child(4) { --dx: 40px; --dy: -50px; animation-delay: .78s; }
+.ship__puffs circle:nth-child(5) { --dx: -6px; --dy: -40px; animation-delay: 1.04s; }
+.ship__puffs circle:nth-child(6) { --dx: 26px; --dy: -66px; animation-delay: 1.3s; }
+.ship__puffs circle:nth-child(7) { --dx: 48px; --dy: -34px; animation-delay: 1.56s; }
+.ship__puffs circle:nth-child(8) { --dx: 12px; --dy: -74px; animation-delay: 1.82s; }
+.ship__puffs circle:nth-child(9) { --dx: 38px; --dy: -18px; animation-delay: 2.08s; }
+.ship__puffs circle:nth-child(10) { --dx: 22px; --dy: -54px; animation-delay: 2.34s; }
+.ship__pepe { transform-box: view-box; transform-origin: 203px 70px; animation: bob 900ms ease-in-out infinite alternate; }
 .ship__led { animation: glow 3.6s steps(1) infinite; }
 .ship__buttons { animation: glow 380ms steps(2) infinite alternate; }
 
@@ -120,9 +130,9 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @keyframes puff {
-  0%, 55% { opacity: 0; transform: translate(0, 0) scale(.3); }
-  62% { opacity: .9; }
-  100% { opacity: 0; transform: translate(14px, -40px) scale(2.1); }
+  0% { opacity: 0; transform: translate(0, 0) scale(.3); }
+  12% { opacity: .95; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(3.2); }
 }
 
 @keyframes note {

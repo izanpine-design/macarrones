@@ -46,7 +46,7 @@ const DROP_SPEED = 95;
 /** If no rocket drops them, pets walk in after this long anyway. */
 const FALLBACK_MS = 40_000;
 /** Pets on the ground plan something together every few seconds. */
-const SOCIAL_EVERY_MS = [7000, 13000] as const;
+const SOCIAL_EVERY_MS = [14000, 26000] as const;
 /** Movable modes that can be interrupted by a new plan. */
 const FREE: readonly Mode[] = ['idle', 'walk', 'look', 'stretch'];
 
@@ -309,8 +309,9 @@ export class PetLayer {
     const [a, b] = shuffle(free);
     const catAndDog = a.pet.id === 'pichu' || b.pet.id === 'pichu';
     const roll = Math.random();
-    if (roll < (catAndDog ? 0.55 : 0.4)) this.approach(a, b, 'fight');
-    else if (roll < 0.75) this.approach(a, b, 'friends');
+    // Brawls are the exception: mostly they make friends or play chase.
+    if (roll < (catAndDog ? 0.22 : 0.14)) this.approach(a, b, 'fight');
+    else if (roll < 0.68) this.approach(a, b, 'friends');
     else this.chase(a, b);
   }
 

@@ -1,5 +1,5 @@
 /** Things a crew member carries on their rocket. */
-export type CrewObject = 'vaper' | 'bolos' | 'micro' | 'mando';
+export type CrewObject = 'vaper' | 'bolos' | 'micro' | 'mando' | 'pepe';
 
 export type PetId = 'pichu' | 'nael' | 'simba' | 'enana';
 
@@ -29,6 +29,7 @@ export const OBJECT_EMOJI: Readonly<Record<CrewObject, string>> = {
   bolos: '🎳',
   micro: '🎤',
   mando: '🎮',
+  pepe: '🐸',
 };
 
 export const CREW: readonly CrewMember[] = [
@@ -64,7 +65,8 @@ export const CREW: readonly CrewMember[] = [
     colorOscuro: '#17663f',
     pelo: '#5a3a22',
     cabeza: null,
-    delante: null,
+    // Sad Pepe plush, like Orslok's.
+    delante: 'pepe',
     detras: null,
     mascota: 'simba',
   },
