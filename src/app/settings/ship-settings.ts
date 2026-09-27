@@ -18,6 +18,7 @@ const OBJECT_NAMES: Record<CrewObject, string> = {
   micro: 'Micrófono',
   mando: 'Mando',
   pepe: 'Peluche de Pepe',
+  jackson: 'Peluche de Michael Jackson',
 };
 
 /**

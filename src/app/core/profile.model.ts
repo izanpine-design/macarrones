@@ -96,7 +96,7 @@ export function uploadedPictures(ship: ShipConfig): string[] {
   );
 }
 
-const OBJECTS: readonly CrewObject[] = ['vaper', 'bolos', 'micro', 'mando', 'pepe'];
+const OBJECTS: readonly CrewObject[] = ['vaper', 'bolos', 'micro', 'mando', 'pepe', 'jackson'];
 const PETS: readonly PetId[] = ['pichu', 'nael', 'simba', 'enana', 'gordo'];
 
 /** Fills missing / invalid fields of a stored rocket with the defaults. */

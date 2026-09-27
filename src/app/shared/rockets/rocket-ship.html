@@ -44,10 +44,20 @@
     <path d="M126 79Q104 70 100 50" fill="none" [attr.stroke]="c.colorOscuro" stroke-width="10" stroke-linecap="round" />
     @if (c.detras; as thing) {
       <g appShipObject [object]="thing" [vapeFill]="'url(#' + id.vape + ')'"
-        [attr.transform]="thing === 'mando' || thing === 'pepe' ? 'translate(100 47) scale(-1 1)' : 'translate(100 47)'" />
+        [attr.transform]="thing === 'mando' || thing === 'pepe' || thing === 'jackson' ? 'translate(100 47) scale(-1 1)' : 'translate(100 47)'" />
     }
     <circle cx="100" cy="47" r="7" fill="#fff" stroke="#1d1626" stroke-width="2" />
   </g>
+
+  <!-- A cut-out head (transparent background) goes behind the tube: whatever
+       body comes with the picture stays hidden inside, as if sitting in it -->
+  @if (c.cabezaLibre && c.cabeza) {
+    <g transform="translate(150 62) scale(1.6) translate(-150 -62)">
+      <g class="ship__head">
+        <image [attr.href]="c.cabeza" x="120" y="16" width="60" height="62" preserveAspectRatio="xMidYMax meet" />
+      </g>
+    </g>
+  }
 
   <!-- The macaroni: ridged pasta tube -->
   <path d="M64 70H192A10 22 0 0 1 192 114H64A10 22 0 0 1 64 70Z" [attr.fill]="'url(#' + id.pasta + ')'" stroke="#a85b39" stroke-width="2" />
@@ -82,7 +92,9 @@
   <!-- Pilot: neck out of the tube, scarf and head -->
   <g class="ship__pilot">
     <ellipse cx="150" cy="71" rx="17" ry="5" fill="#6d3a26" />
-    <path d="M141 56H159V72H141Z" fill="#e7b690" />
+    @if (!c.cabezaLibre || !c.cabeza) {
+      <path d="M141 56H159V72H141Z" fill="#e7b690" />
+    }
     <path class="ship__scarf" d="M137 64C119 57 104 71 82 61C94 77 116 77 139 72Z" [attr.fill]="c.color" [attr.stroke]="c.colorOscuro" stroke-width="1.5" />
     <ellipse cx="150" cy="66" rx="16" ry="6" [attr.fill]="c.color" [attr.stroke]="c.colorOscuro" stroke-width="2" />
 
@@ -90,8 +102,7 @@
     <g transform="translate(150 62) scale(1.6) translate(-150 -62)">
       <g class="ship__head">
         @if (c.cabezaLibre && c.cabeza) {
-          <!-- Cut-out photo (transparent background): as it is, sitting on the collar -->
-          <image [attr.href]="c.cabeza" x="120" y="6" width="60" height="62" preserveAspectRatio="xMidYMax meet" />
+          <!-- Cut-out photo: drawn behind the tube (above) -->
         } @else if (c.cabeza; as photo) {
           <circle cx="150" cy="38" r="23" fill="#f1c29c" />
           <image [attr.href]="photo" x="126" y="14" width="48" height="48" preserveAspectRatio="xMidYMid slice" [attr.clip-path]="'url(#' + id.head + ')'" />
@@ -157,6 +168,19 @@
       <g class="ship__notes" [attr.fill]="c.color" stroke="#1d1626" stroke-width=".8">
         <text x="190" y="36">♪</text>
         <text x="190" y="36">♫</text>
+      </g>
+    }
+    <!-- The Michael Jackson plush keeps going "hee hee!" -->
+    @if (c.delante === 'jackson') {
+      <g class="ship__hehe">
+        <text x="206" y="14" [class.ship__name--flip]="flipped()">hee hee!</text>
+        <text x="206" y="14" [class.ship__name--flip]="flipped()">hee hee!</text>
+      </g>
+    }
+    @if (c.detras === 'jackson') {
+      <g class="ship__hehe">
+        <text x="84" y="2" [class.ship__name--flip]="flipped()">hee hee!</text>
+        <text x="84" y="2" [class.ship__name--flip]="flipped()">hee hee!</text>
       </g>
     }
     @if (c.detras === 'micro') {

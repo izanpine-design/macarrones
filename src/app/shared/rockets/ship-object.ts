@@ -45,6 +45,36 @@ import { CrewObject } from '../crew/crew';
           <svg:path d="M-6 -9.5Q4 -5.5 15 -10.5" fill="none" stroke="#a8483a" stroke-width="3.2" stroke-linecap="round" />
         </svg:g>
       }
+      @case ('jackson') {
+        <!-- Michael Jackson plush: big printed face, curls, black jacket with buckles, arm up -->
+        <svg:g transform="scale(1.2)">
+        <svg:g class="dance">
+          <svg:path d="M-3 .5V17M2.6 .5V17" stroke="#221c22" stroke-width="3.4" stroke-linecap="round" />
+          <svg:path d="M-3 2V16M2.6 2V16" stroke="#d9a3a3" stroke-width="3.4" stroke-dasharray="1 2.4" />
+          <svg:path d="M-5.5 -13Q-9.5 -8 -5.5 -3.5" fill="none" stroke="#221c22" stroke-width="3" stroke-linecap="round" />
+          <svg:path d="M5 -13Q9 -17 12 -23" fill="none" stroke="#221c22" stroke-width="3.2" stroke-linecap="round" />
+          <svg:path d="M6.5 -14.5Q9.5 -18 11.4 -21.5" fill="none" stroke="#d9a3a3" stroke-width="3.2" stroke-dasharray="1 2.2" />
+          <svg:circle cx="12.4" cy="-24.2" r="1.6" fill="#c98e6c" stroke="#5a3322" stroke-width=".5" />
+          <svg:path d="M-6 -15H6L5 -1H-5Z" fill="#221c22" stroke="#0d0a0d" stroke-width=".6" stroke-linejoin="round" />
+          <svg:path d="M-2.2 -15L0 -11.5L2.2 -15Z" fill="#f5f2ec" />
+          <svg:path d="M-2.2 -15L-3.5 -8M2.2 -15L3.5 -8" stroke="#55505a" stroke-width=".7" />
+          <svg:rect x="-5.5" y="-2" width="11" height="2.4" rx=".6" fill="#b8923e" stroke="#5a4210" stroke-width=".5" />
+          <svg:path d="M-3.5 -.8h1M-.5 -.8h1M2.5 -.8h1" stroke="#fff1b8" stroke-width=".7" />
+          <svg:rect x="-1.4" y="-17.6" width="2.8" height="2.8" fill="#b57a5a" />
+          <svg:path d="M-9 -18Q-12 -30 -7 -35Q0 -39 7 -35Q12 -30 9 -18Q10 -13 7 -12L7 -20Q0 -18 -7 -20L-7 -12Q-10 -13 -9 -18Z" fill="#1a1210" />
+          <svg:ellipse cx="0" cy="-24" rx="6" ry="7.5" fill="#c98e6c" stroke="#5a3322" stroke-width=".6" />
+          <svg:path d="M-6.5 -27Q-5 -33 1 -32.5Q6 -32 6.5 -26Q4 -30 0 -29.5Q-2 -28 -3 -30Q-4 -27 -6.5 -27Z" fill="#1a1210" />
+          <svg:path d="M1 -30q-2 3 0 5" fill="none" stroke="#1a1210" stroke-width=".9" stroke-linecap="round" />
+          <svg:path d="M-4.6 -26.4l3 -.6M1.6 -27l3 .6" stroke="#1a1210" stroke-width=".9" stroke-linecap="round" />
+          <svg:ellipse cx="-2.6" cy="-24.6" rx="1.3" ry=".75" fill="#fff" />
+          <svg:ellipse cx="2.6" cy="-24.6" rx="1.3" ry=".75" fill="#fff" />
+          <svg:circle cx="-2.5" cy="-24.6" r=".6" fill="#2b1a14" />
+          <svg:circle cx="2.7" cy="-24.6" r=".6" fill="#2b1a14" />
+          <svg:path d="M0 -24l-.7 2.6h1.4" fill="none" stroke="#8a5a42" stroke-width=".5" stroke-linejoin="round" />
+          <svg:path d="M-1.7 -19.6q1.7 .9 3.4 0" fill="none" stroke="#7a3f35" stroke-width=".8" stroke-linecap="round" />
+        </svg:g>
+        </svg:g>
+      }
       @case ('bolos') {
         <svg:circle cx="-3" cy="-15" r="13" fill="#3a2c86" stroke="#1d1626" stroke-width="2" />
         <svg:path d="M-11 -22Q-7 -26 -2 -26" fill="none" stroke="#9d8cf2" stroke-width="2.5" stroke-linecap="round" />
@@ -58,6 +88,8 @@ import { CrewObject } from '../crew/crew';
     .led { animation: glow 3.6s steps(1) infinite; }
     .buttons { animation: glow 380ms steps(2) infinite alternate; }
     .pepe { transform-box: fill-box; transform-origin: 50% 100%; animation: bob 900ms ease-in-out infinite alternate; }
+    /* The plush sways to the beat. */
+    .dance { transform-box: fill-box; transform-origin: 50% 60%; animation: bob 460ms ease-in-out infinite alternate; }
     @keyframes glow { from { opacity: .45; } to { opacity: 1; } }
     @keyframes bob { from { transform: rotate(-5deg); } to { transform: rotate(4deg); } }
   `,
