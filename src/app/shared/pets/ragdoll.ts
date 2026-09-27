@@ -6,6 +6,8 @@ import { PixelSprite } from '../pixel/pixel-sprite';
 export interface Rig {
   neck: number;
   spine: number;
+  /** Rows of an ear drawn in the column just before the neck (Pichu's): they move with the head. */
+  ear?: number;
 }
 
 /** Width of each bendy slice of body, in sprite pixels. */
@@ -183,13 +185,24 @@ export class Ragdoll {
 
 const slices = new WeakMap<PixelFrame, Map<string, PixelFrame>>();
 
-/** Columns [from, to) of a frame, cached so every sprite reuses the same pieces. */
-function sliceFrame(frame: PixelFrame, from: number, to: number): PixelFrame {
+/**
+ * Columns [from, to) of a frame, cached so every sprite reuses the same pieces.
+ * `ear`: in that column, keep only the top `rows` (`above`) or only the rest.
+ */
+function sliceFrame(frame: PixelFrame, from: number, to: number, ear?: { col: number; rows: number; above: boolean }): PixelFrame {
   let byRange = slices.get(frame);
   if (!byRange) slices.set(frame, (byRange = new Map()));
-  const key = `${from}:${to}`;
+  const key = `${from}:${to}:${ear ? `${ear.col}:${ear.rows}:${ear.above}` : ''}`;
   let slice = byRange.get(key);
-  if (!slice) byRange.set(key, (slice = frame.map((row) => row.slice(from, to))));
+  if (!slice) {
+    slice = frame.map((row, y) => {
+      const part = row.slice(from, to);
+      if (!ear || ear.col < from || ear.col >= to || y < ear.rows === ear.above) return part;
+      const at = ear.col - from;
+      return part.slice(0, at) + '.' + part.slice(at + 1);
+    });
+    byRange.set(key, slice);
+  }
   return slice;
 }
 
@@ -226,18 +239,21 @@ export class PetRagdoll {
   protected readonly origin = computed(() => ((this.rig().spine + 0.5) / this.frame().length) * 100);
   protected readonly pieces = computed(() => {
     const frame = this.frame();
-    const { neck } = this.rig();
+    const { neck, ear = 0 } = this.rig();
     const columns = frame[0].length;
-    const piece = (start: number, end: number) => ({
-      frame: sliceFrame(frame, start, end),
+    // An ear sticking out over the nape (the column before the neck) belongs to
+    // the head: the head piece takes those top pixels and the body the rest.
+    const earCol = { col: neck - 1, rows: ear };
+    const piece = (start: number, end: number, above: boolean) => ({
+      frame: sliceFrame(frame, start, end, ear ? { ...earCol, above } : undefined),
       left: (start / columns) * 100,
       width: ((end - start) / columns) * 100,
     });
     const pieces = [];
     // The slice by the neck stops at the head: overlapping it would drag the
     // nape's outline along with the body, like a stick poking out.
-    for (let from = 0; from < neck; from += SLICE) pieces.push(piece(from, Math.min(neck, from + SLICE + 1)));
-    pieces.push(piece(neck, columns));
+    for (let from = 0; from < neck; from += SLICE) pieces.push(piece(from, Math.min(neck, from + SLICE + 1), false));
+    pieces.push(piece(ear ? neck - 1 : neck, columns, true));
     return pieces;
   });
 }

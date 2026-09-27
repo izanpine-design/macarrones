@@ -347,7 +347,7 @@ export interface PetArt {
   frames: PetFrames;
   palette: PixelPalette;
   /** Where it bends when picked up: neck column and spine row (see Ragdoll). */
-  rig: { neck: number; spine: number };
+  rig: { neck: number; spine: number; ear?: number };
   /** Blown-up look, for pets that land bouncing instead of by parachute. */
   ball?: PixelFrame;
   /** Leg lifted for a wee (only the dog does that). */
@@ -358,7 +358,8 @@ export const PET_ART = {
   // Noe's long-haired chihuahua: chocolate with tan eyebrows and legs, cream muzzle.
   pichu: {
     frames: DOG_FRAMES,
-    rig: { neck: 12, spine: 9 },
+    // Its left ear pokes out one column behind the neck (rows 0–1).
+    rig: { neck: 12, spine: 9, ear: 2 },
     pee: patch(DOG_STAND, DOG_LEG_UP),
     palette: {
       k: '#1e120d', e: '#b9764a', h: '#4a2a1f', t: '#c98a4f', y: '#120b08', w: '#fff6e8', n: '#3a2320',
