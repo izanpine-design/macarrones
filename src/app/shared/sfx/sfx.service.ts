@@ -2,7 +2,7 @@ import { DOCUMENT, inject, Service, signal } from '@angular/core';
 
 const STORAGE_KEY = 'macarrones.sonido';
 
-export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers' | 'beep' | 'go' | 'launch' | 'warp' | 'arrive' | 'hiss' | 'woof' | 'scuffle';
+export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers' | 'beep' | 'go' | 'launch' | 'warp' | 'arrive' | 'hiss' | 'woof' | 'scuffle' | 'boing' | 'scratch' | 'pee';
 
 /**
  * Tiny synthesised sound effects (Web Audio, no files to download).
@@ -82,6 +82,21 @@ export class SfxService {
       case 'scuffle':
         // A cartoon fight: a quick string of thumps and scratches.
         for (let i = 0; i < 9; i++) this.noiseBurst(ctx, t + i * 0.17 + Math.random() * 0.05, 0.12, 0.3, 2500, 300);
+        break;
+      case 'boing':
+        // Rubbery bounce: a quick dip and a wobbly spring back up.
+        this.tone(ctx, 'sine', 330, 120, t, 0.08, 0.22);
+        this.tone(ctx, 'triangle', 150, 520, t + 0.06, 0.28, 0.16);
+        break;
+      case 'scratch':
+        // Three fast claw swipes.
+        [0, 0.09, 0.18].forEach((d) => this.noiseBurst(ctx, t + d, 0.08, 0.35, 7000, 1800));
+        this.noiseBurst(ctx, t, 0.4, 0.2, 5000, 2500);
+        break;
+      case 'pee':
+        // A soft trickle.
+        this.noiseBurst(ctx, t, 2.2, 0.05, 3200, 1400);
+        this.noiseBurst(ctx, t + 0.15, 1.6, 0.03, 6000, 2500);
         break;
       case 'hiss':
         this.noiseBurst(ctx, t, 0.45, 0.25, 5000, 2500);

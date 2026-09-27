@@ -10,9 +10,10 @@
   position: absolute;
   top: 0;
   left: 0;
-  cursor: pointer;
+  cursor: grab;
   pointer-events: auto;
-  touch-action: manipulation;
+  /* Dragging a pet must not scroll the page. */
+  touch-action: none;
   user-select: none;
   will-change: transform;
   -webkit-tap-highlight-color: transparent;
@@ -21,12 +22,14 @@
 .pet[data-mode='hidden'] { visibility: hidden; pointer-events: none; }
 .pet[data-mode='drop'] { pointer-events: none; }
 .pet[data-mode='brawl'] { opacity: 0; pointer-events: none; }
+.pet[data-mode='bounce'] { pointer-events: none; }
+.pet[data-mode='held'] { z-index: 1; cursor: grabbing; }
+[data-pet='gordo'] .pet__body { width: 84px; }
 
 .pet__body {
   width: 72px;
   /* A thin light rim keeps the black cat visible on the dark space background. */
   filter: drop-shadow(0 0 1px rgb(255 248 230 / 75%)) drop-shadow(0 3px 2px rgb(0 0 0 / 28%));
-  transform: scaleX(var(--facing, 1));
   transform-origin: 50% 100%;
 }
 
@@ -45,6 +48,43 @@
 [data-mode='stretch'] .pet__body > * { animation: stretch 1.6s ease-in-out; transform-origin: 50% 100%; }
 [data-mode='angry'] .pet__body { animation: fume 90ms linear infinite; filter: drop-shadow(0 0 3px #ff4d3d) drop-shadow(0 3px 2px rgb(0 0 0 / 28%)); }
 [data-mode='love'] .pet__body { animation: hop 700ms ease-in-out infinite; }
+/* Mirrored on the sprite itself, so the body can tilt round the scruff (set from code). */
+.pet__body > app-pixel-sprite { scale: var(--facing, 1) 1; }
+/* Held or thrown, the bendy ragdoll is drawn instead. */
+:is([data-mode='held'], [data-mode='fall']) .pet__body > app-pixel-sprite { visibility: hidden; }
+
+/* The balloon's air escaping from its back. */
+.pet__air {
+  position: absolute;
+  bottom: calc(var(--puff, 1) * 38%);
+  left: calc(50% - (var(--puff, 1) * 50% + 12px) * var(--facing, 1) - 12px);
+  font-size: 20px;
+  transform: scaleX(var(--facing, 1));
+  animation: air 260ms ease-out infinite;
+}
+
+.scratch {
+  position: absolute;
+  width: 76px;
+  height: 90px;
+  translate: -50% -50%;
+  rotate: -24deg;
+}
+
+.scratch span {
+  position: absolute;
+  left: 8px;
+  width: 10px;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(#ff7a6b, #c0142a);
+  box-shadow: 0 0 0 2px #3a0a12, 0 0 10px rgb(255 50 40 / 80%);
+  transform-origin: top;
+  animation: claw 900ms ease-out both;
+}
+
+.scratch span + span { left: 33px; animation-delay: 50ms; }
+.scratch span + span + span { left: 58px; animation-delay: 100ms; }
 
 /* Little puffs of dust when running. */
 [data-mode='run'] .pet__body,
@@ -148,10 +188,13 @@
 @keyframes dust { from { opacity: .8; transform: scale(.4); } to { opacity: 0; transform: translate(calc(-12px * var(--facing, 1)), -6px) scale(1.4); } }
 @keyframes bubble { from { opacity: 0; transform: translate(-50%, 6px) scale(.5); } to { opacity: 1; transform: translate(-50%, -4px); } }
 @keyframes tumble { 25% { rotate: 6deg; scale: 1.05; } 50% { rotate: -4deg; } 75% { rotate: 3deg; scale: .96; } }
+@keyframes air { from { opacity: 1; translate: 0 0; } to { opacity: .2; translate: calc(-14px * var(--facing, 1)) -4px; } }
+@keyframes claw { 0% { scale: 1 0; } 18% { scale: 1 1; opacity: 1; } 100% { scale: 1 1; opacity: 0; } }
 @keyframes fly-out { from { opacity: 1; transform: translate(0, 0) scale(.6); } to { opacity: 0; transform: translate(var(--bx), var(--by)) scale(1.2) rotate(40deg); } }
 
 @media (max-width: 600px) {
   .pet__body { width: 54px; }
+  [data-pet='gordo'] .pet__body { width: 63px; }
   .brawl { width: 120px; height: 72px; }
 }
 

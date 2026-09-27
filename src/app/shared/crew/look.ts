@@ -1,4 +1,4 @@
-import { Profile } from '../../core/profile.model';
+import { isCutoutHead, Profile } from '../../core/profile.model';
 import { CrewMember, CrewObject, PetId } from './crew';
 
 /**
@@ -13,6 +13,8 @@ export interface Look {
   colorOscuro: string;
   pelo: string;
   cabeza: string | null;
+  /** The head is a cut-out (transparent background): no round frame. */
+  cabezaLibre: boolean;
   delante: CrewObject | null;
   detras: CrewObject | null;
   mascota: PetId | null;
@@ -33,6 +35,7 @@ export function profileLook(profile: Profile, url: (ref: string) => string): Loo
     colorOscuro: ship.colorOscuro,
     pelo: ship.pelo,
     cabeza: picture(ship.cabeza),
+    cabezaLibre: isCutoutHead(ship.cabeza),
     delante: ship.delante,
     detras: ship.detras,
     mascota: ship.mascota,
@@ -50,6 +53,7 @@ export function crewLook(member: CrewMember): Look {
     colorOscuro: member.colorOscuro,
     pelo: member.pelo,
     cabeza: member.cabeza,
+    cabezaLibre: false,
     delante: member.delante,
     detras: member.detras,
     mascota: member.mascota,

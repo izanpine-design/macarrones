@@ -1,7 +1,7 @@
 /** Things a crew member carries on their rocket. */
 export type CrewObject = 'vaper' | 'bolos' | 'micro' | 'mando' | 'pepe';
 
-export type PetId = 'pichu' | 'nael' | 'simba' | 'enana';
+export type PetId = 'pichu' | 'nael' | 'simba' | 'enana' | 'gordo';
 
 export type CrewId = 'noe' | 'raul' | 'izan' | 'miguel';
 

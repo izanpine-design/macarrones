@@ -1,5 +1,6 @@
 import { Service, signal } from '@angular/core';
-import { CREW, PetId } from '../crew/crew';
+import { PetId } from '../crew/crew';
+import { PET_IDS } from './pets';
 
 /** aboard: riding its owner's rocket · dropping: parachute · ground: roaming the page. */
 export type PetPhase = 'aboard' | 'dropping' | 'ground';
@@ -18,7 +19,7 @@ export interface PetDrop {
 @Service()
 export class PetService {
   private readonly _phases = signal<Record<PetId, PetPhase>>(
-    Object.fromEntries(CREW.map((m) => [m.mascota, 'aboard'])) as Record<PetId, PetPhase>,
+    Object.fromEntries(PET_IDS.map((id) => [id, 'aboard'])) as Record<PetId, PetPhase>,
   );
   readonly phases = this._phases.asReadonly();
 

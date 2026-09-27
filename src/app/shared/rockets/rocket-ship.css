@@ -76,9 +76,8 @@
 .ship__puffs circle:nth-child(8) { --dx: 12px; --dy: -74px; animation-delay: 1.82s; }
 .ship__puffs circle:nth-child(9) { --dx: 38px; --dy: -18px; animation-delay: 2.08s; }
 .ship__puffs circle:nth-child(10) { --dx: 22px; --dy: -54px; animation-delay: 2.34s; }
-.ship__pepe { transform-box: view-box; transform-origin: 203px 70px; animation: bob 900ms ease-in-out infinite alternate; }
-.ship__led { animation: glow 3.6s steps(1) infinite; }
-.ship__buttons { animation: glow 380ms steps(2) infinite alternate; }
+/* The raised hand's cloud trails backwards, away from the face. */
+.ship__puffs--back circle { transform-origin: 82px 33px; --flip: -1; }
 
 .ship__notes text {
   font: 700 16px/1 system-ui, sans-serif;
@@ -132,7 +131,7 @@
 @keyframes puff {
   0% { opacity: 0; transform: translate(0, 0) scale(.3); }
   12% { opacity: .95; }
-  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(3.2); }
+  100% { opacity: 0; transform: translate(calc(var(--dx) * var(--flip, 1)), var(--dy)) scale(3.2); }
 }
 
 @keyframes note {

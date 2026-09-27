@@ -17,6 +17,18 @@ describe('pixel art', () => {
           if (char !== '.') expect(art.palette, `${pose} uses "${char}"`).toHaveProperty(char);
         }
       }
+      for (const extra of ['ball', 'pee'] as const) {
+        const frame = (art as { [k in typeof extra]?: PixelFrame })[extra];
+        if (!frame) continue;
+        expectRectangular(frame);
+        for (const char of new Set(frame.join(''))) {
+          if (char !== '.') expect(art.palette, `${extra} uses "${char}"`).toHaveProperty(char);
+        }
+      }
+      if ('pee' in art) {
+        expect(art.pee.length).toBe(stand.length);
+        expect(art.pee[0].length).toBe(stand[0].length);
+      }
     });
   }
 

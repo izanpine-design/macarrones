@@ -1,11 +1,28 @@
+<!-- Wee puddles, under the pets -->
+@for (puddle of puddles(); track puddle.id) {
+  <app-pee-puddle [puddle]="puddle" />
+}
+
 @for (pet of pets; track pet.id) {
-  <div class="pet" [attr.data-pet]="pet.id" [attr.data-mode]="modes()[pet.id]" (pointerdown)="pat(pet.id)">
-    @if (modes()[pet.id] === 'drop') {
+  @let mode = modes()[pet.id];
+  <div class="pet" [attr.data-pet]="pet.id" [attr.data-mode]="mode"
+    (pointerdown)="grab(pet.id, $event)" (pointermove)="drag(pet.id, $event)"
+    (pointerup)="letGo(pet.id, $event)" (pointercancel)="letGo(pet.id, $event)">
+    @if (mode === 'drop') {
       <app-pixel-sprite class="pet__chute" [frame]="parachute" [palette]="pet.chutePalette" />
     }
     <div class="pet__body">
-      <app-pixel-sprite [frame]="pet.art.frames[poses()[pet.id]]" [palette]="pet.art.palette" />
+      <app-pixel-sprite [frame]="frameOf(pet, mode, poses()[pet.id])" [palette]="pet.art.palette" />
+      @if (mode === 'held' || mode === 'fall') {
+        <app-pet-ragdoll [frame]="pet.art.frames[poses()[pet.id]]" [palette]="pet.art.palette" [rig]="pet.art.rig" />
+      }
     </div>
+    @if (mode === 'pee') {
+      <app-pee-stream />
+    }
+    @if (mode === 'bounce') {
+      <span class="pet__air">💨</span>
+    }
     <span class="pet__zzz">z<span>z</span><span>z</span></span>
     @if (bubbles()[pet.id]; as bubble) {
       <span class="pet__bubble">{{ bubble }}</span>
@@ -23,4 +40,9 @@
     <span class="brawl__bit">💢</span>
     <span class="brawl__bit">✨</span>
   </div>
+}
+
+<!-- Claw marks where a held pet scratched -->
+@for (mark of scratches(); track mark.at) {
+  <div class="scratch" [style.left.px]="mark.x" [style.top.px]="mark.y"><span></span><span></span><span></span></div>
 }

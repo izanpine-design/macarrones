@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, model, signal } from '@angular/core';
 import { ACCEPTED_PICTURE_TYPES } from '../core/picture';
-import { PictureKind } from '../core/profile.model';
+import { isCutoutHead, PictureKind } from '../core/profile.model';
 import { ProfileService } from '../core/profile.service';
 
 let nextId = 0;
@@ -13,7 +13,7 @@ let nextId = 0;
   selector: 'app-picture-field',
   template: `
     <div class="picture-field">
-      <div class="picture-field__preview" [class.picture-field__preview--round]="kind() === 'cabeza'">
+      <div class="picture-field__preview" [class.picture-field__preview--round]="kind() === 'cabeza' && !cutout()" [class.picture-field__preview--free]="cutout()">
         @if (url(); as src) {
           <img [src]="src" [alt]="label() + ' actual'" />
         } @else {
@@ -62,6 +62,7 @@ let nextId = 0;
       text-align: center;
     }
     .picture-field__preview--round { border-radius: 50%; }
+    .picture-field__preview--free img { object-fit: contain; object-position: bottom; }
     .picture-field__preview img { width: 100%; height: 100%; object-fit: cover; }
     .picture-field__actions { flex: 1; min-width: 0; }
   `,
@@ -81,6 +82,8 @@ export class PictureField {
   protected readonly helpId = `${this.inputId}-help`;
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
+  /** A head uploaded with a transparent background is shown whole, not in a circle. */
+  protected readonly cutout = computed(() => this.kind() === 'cabeza' && isCutoutHead(this.value()));
   protected readonly url = computed(() => {
     const ref = this.value();
     return ref ? this.profiles.pictureUrl(ref) : null;

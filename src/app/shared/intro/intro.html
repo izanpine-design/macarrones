@@ -17,8 +17,13 @@
           <span class="intro__label" [style.--label]="c.look.color">{{ c.look.nombre }} {{ c.label }}</span>
           @if (c.pet; as pet) {
             <div class="intro__bailout">
-              <app-pixel-sprite class="intro__chute" [frame]="parachute" [palette]="pet.chutePalette" />
-              <app-pixel-sprite class="intro__pet" [frame]="pet.art.frames.stand" [palette]="pet.art.palette" />
+              @if (pet.art.ball; as ball) {
+                <!-- Blown up like a balloon instead of a parachute -->
+                <app-pixel-sprite class="intro__pet" [frame]="ball" [palette]="pet.art.palette" />
+              } @else {
+                <app-pixel-sprite class="intro__chute" [frame]="parachute" [palette]="pet.chutePalette" />
+                <app-pixel-sprite class="intro__pet" [frame]="pet.art.frames.stand" [palette]="pet.art.palette" />
+              }
             </div>
           }
         </div>

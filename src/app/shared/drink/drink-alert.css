@@ -97,6 +97,9 @@
   animation: tipsy 1.6s ease-in-out infinite alternate;
 }
 
+/* A cut-out head (no circle) is bigger, to cover the original face. */
+.drink__head--free { top: 20%; left: 45%; width: 60%; }
+
 .drink__pet {
   position: absolute;
   bottom: 3%;

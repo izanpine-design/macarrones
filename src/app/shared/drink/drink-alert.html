@@ -30,7 +30,7 @@
         } @else {
           <img ngSrc="beber/cuerpo.webp" width="380" height="387" alt="" priority />
         }
-        <app-crew-head class="drink__head" [crew]="crew()" [nickname]="c.apodo" />
+        <app-crew-head class="drink__head" [class.drink__head--free]="crew()?.cabezaLibre" [crew]="crew()" [nickname]="c.apodo" />
         @if (pet(); as p) {
           <div class="drink__pet" aria-hidden="true">
             <app-pixel-sprite class="drink__pet-sprite" [frame]="p.art.frames.wag" [palette]="p.art.palette" />

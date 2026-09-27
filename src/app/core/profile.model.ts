@@ -76,6 +76,14 @@ export function shipFromTemplate(member: CrewMember): ShipConfig {
 
 export const SHIP_TEMPLATES = CREW;
 
+/** Name prefix of head photos uploaded with a transparent background. */
+export const CUTOUT_HEAD = 'cabeza-libre';
+
+/** A cut-out head (reference or URL): drawn as is, without the round frame. */
+export function isCutoutHead(ref: string | null): boolean {
+  return !!ref && ref.includes(`/${CUTOUT_HEAD}-`);
+}
+
 /** True for app assets (public/…), false for paths in the "naves" bucket. */
 export function isAssetPicture(ref: string): boolean {
   return ref.startsWith('crew/') || ref.startsWith('beber/');
@@ -89,7 +97,7 @@ export function uploadedPictures(ship: ShipConfig): string[] {
 }
 
 const OBJECTS: readonly CrewObject[] = ['vaper', 'bolos', 'micro', 'mando', 'pepe'];
-const PETS: readonly PetId[] = ['pichu', 'nael', 'simba', 'enana'];
+const PETS: readonly PetId[] = ['pichu', 'nael', 'simba', 'enana', 'gordo'];
 
 /** Fills missing / invalid fields of a stored rocket with the defaults. */
 export function normalizeShip(value: unknown): ShipConfig {

@@ -2,17 +2,23 @@ import { Component, computed, input } from '@angular/core';
 import { CrewMember } from './crew';
 
 /** What the head needs: a crew member or any Look (personal pilots). */
-export type HeadLook = Pick<CrewMember, 'cabeza' | 'pelo'>;
+export type HeadLook = Pick<CrewMember, 'cabeza' | 'pelo'> & { cabezaLibre?: boolean };
 
 let nextId = 0;
 
 /**
- * Round head of a crew member: their cut-out photo, or the drawn face until
- * there is one. Anyone else gets a coloured circle with their initial.
+ * Round head of a crew member: their photo, or the drawn face until there is
+ * one. Anyone else gets a coloured circle with their initial. A photo with a
+ * transparent background is shown as it is, with no circle.
  */
 @Component({
   selector: 'app-crew-head',
   template: `
+    @if (crew()?.cabezaLibre && crew()?.cabeza) {
+      <svg class="free" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <image [attr.href]="crew()!.cabeza" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMax meet" />
+      </svg>
+    } @else {
     <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
       <defs>
         <clipPath [attr.id]="clipId"><circle cx="50" cy="50" r="44" /></clipPath>
@@ -39,10 +45,13 @@ let nextId = 0;
       }
       <circle cx="50" cy="50" r="44" fill="none" stroke="#1d1626" stroke-width="3" />
     </svg>
+    }
   `,
   styles: `
     :host { display: block; }
     svg { display: block; width: 100%; height: auto; overflow: visible; }
+    /* A thin light rim, like a sticker, keeps the cut-out readable on any background. */
+    .free { filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff) drop-shadow(0 2px 3px rgb(0 0 0 / 35%)); }
     .initial { fill: #fff2cc; font: 400 46px 'Kablammo', cursive; }
   `,
 })

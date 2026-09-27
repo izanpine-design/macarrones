@@ -4,6 +4,7 @@ import { crewLook, Look, profileLook } from '../shared/crew/look';
 import { AuthService } from './auth.service';
 import { preparePicture } from './picture';
 import {
+  CUTOUT_HEAD,
   isAssetPicture,
   LOGIN_DOMAIN,
   normalizeShip,
@@ -153,8 +154,10 @@ export class ProfileService {
   async uploadPicture(kind: PictureKind, file: File): Promise<string> {
     const own = this.own();
     if (!own) throw new Error('Inicia sesión en tu perfil para subir imágenes.');
-    const { blob, extension } = await preparePicture(file, kind, this.document);
-    const path = `${own.user_id}/${kind}-${crypto.randomUUID()}.${extension}`;
+    const { blob, extension, cutout } = await preparePicture(file, kind, this.document);
+    // Cut-out heads are marked in the name, so everyone draws them without the circle.
+    const name = cutout ? CUTOUT_HEAD : kind;
+    const path = `${own.user_id}/${name}-${crypto.randomUUID()}.${extension}`;
     const { error } = await this.supabase.storage.from(BUCKET).upload(path, blob, { contentType: blob.type });
     if (error) throw new Error(`No se ha podido subir la imagen: ${error.message}`);
     return path;
