@@ -727,10 +727,15 @@ export class PetLayer {
       this.sfx.play('scuffle');
     });
     this.later(3000, () => {
-      if (a.partner !== b) return;
+      // Whatever happened meanwhile, nobody may stay inside the (invisible) brawl.
+      const fighters = [a, b].filter((w) => w.mode === 'brawl');
+      if (fighters.length === 0) return;
       this.brawl.set(null);
-      this.release(a);
-      this.release(b);
+      for (const w of fighters) {
+        this.release(w);
+        this.setMode(w, 'idle', 0);
+      }
+      // Out of the dust cloud, each one runs off its own way.
       const [left, right] = a.x < b.x ? [a, b] : [b, a];
       this.runTo(left, 0.02);
       this.runTo(right, 0.95);
