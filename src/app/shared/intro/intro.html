@@ -1,34 +1,49 @@
 @if (visible()) {
-  <div class="intro" [class]="'intro--' + stage()" role="dialog" aria-modal="true" aria-label="Presentación de Macarrones">
-    <canvas #stars class="intro__stars" aria-hidden="true"></canvas>
+  <div #root [class]="'intro intro--' + stage()" role="dialog" aria-modal="true" aria-label="Presentación de Macarrones">
+    <canvas #scene class="intro__scene" aria-hidden="true"></canvas>
 
-    <!-- Planets that zoom past in hyperspace -->
-    <div aria-hidden="true">
-      <app-pasta-planet class="intro__planet intro__planet--cheese" kind="cheese" />
-      <app-pasta-planet class="intro__planet intro__planet--tomato" kind="tomato" />
-      <app-pasta-planet class="intro__planet intro__planet--meatball" kind="meatball" />
-    </div>
+    <!-- Pasta planets drifting past during the air show -->
+    @if (stage() === 'stunt') {
+      <div aria-hidden="true">
+        <app-pasta-planet class="intro__rock intro__rock--cheese" kind="cheese" />
+        <app-pasta-planet class="intro__rock intro__rock--tomato" kind="tomato" />
+        <app-pasta-planet class="intro__rock intro__rock--ball" kind="meatball" />
+        <app-pasta-planet class="intro__rock intro__rock--ball2" kind="meatball" />
+      </div>
+    }
 
-    <!-- The crew in formation; each pet bails out in hyperspace -->
-    <div class="intro__stage" aria-hidden="true">
-      @for (c of pilots(); track c.look.key) {
-        <div class="intro__pilot" [class]="'intro__pilot--' + c.slot">
-          <app-rocket-ship class="intro__ship" [crew]="c.look" [uid]="c.uid" />
+    <!-- Arrival: planet Macarrones and the title -->
+    @if (stage() === 'arrive' || stage() === 'leaving') {
+      <app-intro-planet class="intro__home" />
+      <app-intro-logo class="intro__logo" />
+    }
+
+    <!-- The crew: every rocket is placed frame by frame from the show's timeline -->
+    <div class="intro__crew" aria-hidden="true">
+      @for (c of pilots(); track c.look.key; let i = $index) {
+        <div class="intro__pilot">
+          <app-rocket-ship class="intro__ship" [crew]="c.look" [uid]="c.uid" [pet]="bailed() ? null : c.pet" [flipped]="flipped()[i]" />
           <span class="intro__label" [style.--label]="c.look.color">{{ c.look.nombre }} {{ c.label }}</span>
+        </div>
+      }
+      @if (bailed()) {
+        @for (c of pilots(); track c.look.key; let i = $index) {
           @if (c.pet; as pet) {
-            <div class="intro__bailout">
+            <div class="intro__jumper" [attr.data-i]="i">
               @if (pet.art.ball; as ball) {
                 <!-- Blown up like a balloon instead of a parachute -->
-                <app-pixel-sprite class="intro__pet" [frame]="ball" [palette]="pet.art.palette" />
+                <app-pixel-sprite [frame]="ball" [palette]="pet.art.palette" />
               } @else {
                 <app-pixel-sprite class="intro__chute" [frame]="parachute" [palette]="pet.chutePalette" />
-                <app-pixel-sprite class="intro__pet" [frame]="pet.art.frames.stand" [palette]="pet.art.palette" />
+                <app-pixel-sprite class="intro__pet" [frame]="pet.art.frames.wag" [palette]="pet.art.palette" />
               }
             </div>
           }
-        </div>
+        }
       }
     </div>
+
+    <div #flash class="intro__flash" aria-hidden="true"></div>
 
     @switch (stage()) {
       @case ('ready') {
@@ -41,19 +56,24 @@
         </div>
       }
       @case ('countdown') {
+        <p class="intro__caption intro__caption--top">Secuencia de despegue</p>
         @for (n of [count()]; track n) {
-          <p class="intro__count">{{ n }}</p>
+          <p class="intro__count" role="status">{{ n }}</p>
         }
       }
-      @case ('launch') {
-        <p class="intro__count intro__count--go">¡Despegue!</p>
+      @case ('liftoff') {
+        <p class="intro__slam">¡Despegue!</p>
       }
-      @case ('warp') {}
+      @case ('stunt') {
+        <p class="intro__caption">Exhibición macarrónica</p>
+      }
+      @case ('warp') {
+        <p class="intro__caption intro__caption--warp">Salto al hiperespacio</p>
+      }
       @default {
-        <div class="intro__title">
-          <p class="intro__eyebrow">Una aventura recién salida del horno</p>
-          <p class="intro__logo">Macarrones</p>
-        </div>
+        @if (showPlay()) {
+          <button type="button" class="intro__play" (click)="skip()">¡A jugar! <span aria-hidden="true">🍝</span></button>
+        }
       }
     }
 

@@ -2,7 +2,7 @@ import { DOCUMENT, inject, Service, signal } from '@angular/core';
 
 const STORAGE_KEY = 'macarrones.sonido';
 
-export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers' | 'beep' | 'go' | 'launch' | 'warp' | 'arrive' | 'hiss' | 'woof' | 'scuffle' | 'boing' | 'scratch' | 'pee';
+export type Sfx = 'hit' | 'fall' | 'boom' | 'taunt' | 'pop' | 'cheers' | 'beep' | 'go' | 'launch' | 'warp' | 'arrive' | 'hiss' | 'woof' | 'scuffle' | 'boing' | 'scratch' | 'pee' | 'whoosh' | 'fanfare';
 
 /**
  * Tiny synthesised sound effects (Web Audio, no files to download).
@@ -93,6 +93,15 @@ export class SfxService {
         [0, 0.09, 0.18].forEach((d) => this.noiseBurst(ctx, t + d, 0.08, 0.35, 7000, 1800));
         this.noiseBurst(ctx, t, 0.4, 0.2, 5000, 2500);
         break;
+      case 'whoosh':
+        this.swoosh(ctx, t, 0.9, 0.32);
+        break;
+      case 'fanfare':
+        // Ta-ta-ta-taaa over a warm chord.
+        [392, 523, 659].forEach((f, i) => this.tone(ctx, 'square', f, f, t + i * 0.12, 0.1, 0.07));
+        this.tone(ctx, 'square', 784, 784, t + 0.36, 0.8, 0.08);
+        [523, 659, 784].forEach((f) => this.tone(ctx, 'triangle', f, f, t + 0.36, 1, 0.06));
+        break;
       case 'pee':
         // A soft trickle.
         this.noiseBurst(ctx, t, 2.2, 0.05, 3200, 1400);
@@ -130,6 +139,27 @@ export class SfxService {
     osc.connect(gain).connect(ctx.destination);
     osc.start(at);
     osc.stop(at + length + 0.02);
+  }
+
+  /** Rushing air: filtered noise that swells and fades while its pitch sweeps up and back. */
+  private swoosh(ctx: AudioContext, at: number, length: number, volume: number): void {
+    this.noise ??= whiteNoise(ctx);
+    const source = ctx.createBufferSource();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+    source.buffer = this.noise;
+    source.loop = true;
+    filter.type = 'bandpass';
+    filter.Q.value = 1.4;
+    filter.frequency.setValueAtTime(300, at);
+    filter.frequency.exponentialRampToValueAtTime(3600, at + length * 0.6);
+    filter.frequency.exponentialRampToValueAtTime(700, at + length);
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime(volume, at + length * 0.55);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
+    source.connect(filter).connect(gain).connect(ctx.destination);
+    source.start(at);
+    source.stop(at + length + 0.05);
   }
 
   /** Filtered white noise; the filter sweeps from `from` to `to` Hz. */
