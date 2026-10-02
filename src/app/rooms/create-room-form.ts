@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { form, FormField, maxLength, submit, validate } from '@angular/forms/signals';
 import { GameService } from '../core/game.service';
 import { Level } from '../core/question.model';
-import { ROOM_PASSWORD_MAX_LENGTH, ROOM_PASSWORD_MIN_LENGTH } from '../core/room.model';
+import { GAMES_WITHOUT_LEVELS, ROOM_PASSWORD_MAX_LENGTH, ROOM_PASSWORD_MIN_LENGTH } from '../core/room.model';
 import { roomErrorMessage, RoomService } from '../core/room.service';
 
 @Component({
@@ -11,31 +11,33 @@ import { roomErrorMessage, RoomService } from '../core/room.service';
   imports: [FormField],
   template: `
     <form novalidate (submit)="create($event)">
-      <fieldset class="mb-3">
-        <legend class="form-label fs-6">Categoría de las preguntas</legend>
-        @if (levels().length === 0) {
-          <div class="d-flex align-items-center gap-2 small" role="status">
-            <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
-            <span>Cargando categorías…</span>
-          </div>
-        } @else {
-          <div class="d-flex flex-wrap gap-2">
-            @for (level of levels(); track level.id) {
-              <input
-                type="radio"
-                class="btn-check"
-                name="create-level"
-                [id]="'create-level-' + level.id"
-                [checked]="level.id === levelId()"
-                (change)="levelId.set(level.id)"
-              />
-              <label class="btn btn-outline-primary btn-sm text-capitalize" [for]="'create-level-' + level.id">
-                {{ level.nombre }}
-              </label>
-            }
-          </div>
-        }
-      </fieldset>
+      @if (usesLevels()) {
+        <fieldset class="mb-3">
+          <legend class="form-label fs-6">Categoría de las preguntas</legend>
+          @if (levels().length === 0) {
+            <div class="d-flex align-items-center gap-2 small" role="status">
+              <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
+              <span>Cargando categorías…</span>
+            </div>
+          } @else {
+            <div class="d-flex flex-wrap gap-2">
+              @for (level of levels(); track level.id) {
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="create-level"
+                  [id]="'create-level-' + level.id"
+                  [checked]="level.id === levelId()"
+                  (change)="levelId.set(level.id)"
+                />
+                <label class="btn btn-outline-primary btn-sm text-capitalize" [for]="'create-level-' + level.id">
+                  {{ level.nombre }}
+                </label>
+              }
+            </div>
+          }
+        </fieldset>
+      }
 
       <div class="form-check mb-3">
         <input
@@ -92,6 +94,10 @@ export class CreateRoomForm {
   private readonly router = inject(Router);
 
   readonly gameId = input.required<number>();
+  /** `juegos.clave`: games without categories create their room in "suave" without asking. */
+  readonly gameClave = input<string | null>(null);
+
+  protected readonly usesLevels = computed(() => !GAMES_WITHOUT_LEVELS.includes(this.gameClave() ?? ''));
 
   protected readonly levels = signal<Level[]>([]);
   /** Selected category; defaults to the first one (suave). */
@@ -145,7 +151,7 @@ export class CreateRoomForm {
     try {
       const levels = await this.games.getLevels();
       this.levels.set(levels);
-      this.levelId.set(levels[0]?.id ?? null);
+      this.levelId.set((levels.find((l) => l.nombre === 'suave') ?? levels[0])?.id ?? null);
     } catch (e) {
       this.error.set(roomErrorMessage(e));
     }

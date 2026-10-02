@@ -1,12 +1,13 @@
-import { Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, effect, inject, input, signal, untracked } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { RoomInfo, RoomPlayer, Turn } from '../core/room.model';
-import { roomErrorMessage, RoomService } from '../core/room.service';
+import { isNetworkError, roomErrorMessage, RoomService } from '../core/room.service';
 import { TurnService } from '../core/turn.service';
 import { ProfileService } from '../core/profile.service';
 import { RoomLobby } from './room-lobby';
 import { RoomPasswordForm } from './room-password-form';
 import { TruthOrDareGame } from './truth-or-dare/truth-or-dare-game';
+import { PartyGame } from '../party/party-game';
 import { BackButton } from '../shared/back-button/back-button';
 import { DrinkAlert } from '../shared/drink/drink-alert';
 import { GameThemeService } from '../shared/themes/game-theme.service';
@@ -20,7 +21,13 @@ import { PlanetBadge } from '../shared/themes/planet-badge';
  */
 @Component({
   selector: 'app-room-page',
-  imports: [RouterLink, RoomLobby, RoomPasswordForm, TruthOrDareGame, BackButton, PlanetBadge, DrinkAlert],
+  host: {
+    // Phones cut connections while the page is in the background (e.g. while
+    // sharing the invite): catch up when it comes back.
+    '(document:visibilitychange)': 'onVisibilityChange()',
+    '(window:online)': 'resync()',
+  },
+  imports: [RouterLink, RoomLobby, RoomPasswordForm, TruthOrDareGame, PartyGame, BackButton, PlanetBadge, DrinkAlert],
   template: `
     <nav class="page-crumb" aria-label="Navegación">
       @if (room()?.soy_miembro) {
@@ -50,13 +57,24 @@ import { PlanetBadge } from '../shared/themes/planet-badge';
             <span>Entrando en la sala…</span>
           </div>
         } @else if (error()) {
-          <div class="alert alert-danger" role="alert">{{ error() }}</div>
+          <div class="alert alert-danger" role="alert">
+            {{ error() }}
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="load()">Reintentar</button>
+          </div>
           <a routerLink="/juegos" class="link-primary">← Volver a los juegos</a>
         } @else if (room(); as room) {
           @if (room.soy_miembro) {
+            @if (syncError(); as message) {
+              <div class="alert alert-warning d-flex align-items-center gap-2 py-2" role="status">
+                <span class="flex-grow-1">{{ message }} Reintentando…</span>
+                <button type="button" class="btn btn-sm btn-outline-dark" (click)="resync()">Reintentar ahora</button>
+              </div>
+            }
             <app-drink-alert [roomId]="room.id" />
-            @if (room.estado === 'jugando' && turn(); as turn) {
+            @if (room.estado === 'jugando' && room.juego_clave === 'verdad_o_reto' && turn(); as turn) {
               <app-truth-or-dare-game [room]="room" [turn]="turn" [hostId]="hostId()" />
+            } @else if (room.estado === 'jugando' && room.juego_clave !== 'verdad_o_reto') {
+              <app-party-game [roomId]="room.id" [clave]="room.juego_clave" [players]="players()" [hostId]="hostId()" />
             } @else {
               <app-room-lobby [room]="room" [players]="players()" [hostId]="hostId()" />
             }
@@ -91,14 +109,20 @@ export class RoomPage {
   readonly codigo = input.required<string>();
 
   protected readonly loading = signal(true);
+  /** The room could not be opened (replaces the page). */
   protected readonly error = signal<string | null>(null);
+  /** A background update failed; the room stays on screen and it retries. */
+  protected readonly syncError = signal<string | null>(null);
   protected readonly leaving = signal(false);
   protected readonly room = signal<RoomInfo | null>(null);
   protected readonly players = signal<RoomPlayer[]>([]);
   protected readonly hostId = signal<string | null>(null);
   protected readonly turn = signal<Turn | null>(null);
 
+  private readonly document = inject(DOCUMENT);
   private stopWatching: (() => void) | null = null;
+  private retryTimer: number | undefined;
+  private retries = 0;
   /** Ignores responses of older refreshes that arrive after newer ones. */
   private refreshCount = 0;
 
@@ -107,7 +131,10 @@ export class RoomPage {
       this.codigo();
       untracked(() => void this.load());
     });
-    inject(DestroyRef).onDestroy(() => this.stopWatching?.());
+    inject(DestroyRef).onDestroy(() => {
+      this.stopWatching?.();
+      this.document.defaultView?.clearTimeout(this.retryTimer);
+    });
   }
 
   protected async load(): Promise<void> {
@@ -141,9 +168,18 @@ export class RoomPage {
       await this.rooms.leaveRoom(room.id);
       await this.router.navigate(destination);
     } catch (e) {
-      this.error.set(roomErrorMessage(e));
+      this.syncError.set(roomErrorMessage(e));
       this.leaving.set(false);
     }
+  }
+
+  /** Brings the room up to date now (button, connection back, page visible again). */
+  protected resync(): void {
+    if (this.room()?.soy_miembro) void this.refresh();
+  }
+
+  protected onVisibilityChange(): void {
+    if (this.document.visibilityState === 'visible') this.resync();
   }
 
   private watch(roomId: string): void {
@@ -160,16 +196,31 @@ export class RoomPage {
       if (room?.soy_miembro) {
         await this.loadMemberData(room, count);
       }
-      if (count === this.refreshCount) this.room.set(room);
+      if (count !== this.refreshCount) return;
+      this.room.set(room);
+      this.syncError.set(null);
+      this.retries = 0;
     } catch (e) {
-      if (count === this.refreshCount) this.error.set(roomErrorMessage(e));
+      if (count !== this.refreshCount) return;
+      // Keep showing the room: tell the player and try again in a moment.
+      this.syncError.set(isNetworkError(e) ? 'Se ha cortado la conexión.' : roomErrorMessage(e));
+      this.scheduleRetry();
     }
+  }
+
+  /** Retries after 2 s, 4 s, 8 s… up to 30 s. */
+  private scheduleRetry(): void {
+    const window = this.document.defaultView;
+    if (!window) return;
+    window.clearTimeout(this.retryTimer);
+    const delay = Math.min(30_000, 2000 * 2 ** this.retries++);
+    this.retryTimer = window.setTimeout(() => this.resync(), delay);
   }
 
   private async loadMemberData(room: RoomInfo, count = this.refreshCount): Promise<void> {
     const [lobby, turn] = await Promise.all([
       this.rooms.getLobby(room.id),
-      room.estado === 'jugando' ? this.turns.getCurrentTurn(room.id) : Promise.resolve(null),
+      room.estado === 'jugando' && room.juego_clave === 'verdad_o_reto' ? this.turns.getCurrentTurn(room.id) : Promise.resolve(null),
     ]);
     if (count !== this.refreshCount) return;
     this.players.set(lobby.players);

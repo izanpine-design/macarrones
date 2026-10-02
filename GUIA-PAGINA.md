@@ -6,7 +6,7 @@
 
 Macarrones es una aplicación web para jugar en grupo. Está hecha con Angular y usa Supabase para autenticación, datos de salas y sincronización en tiempo real. La experiencia visual combina espacio, cohetes de macarrón, mascotas pixeladas y temas para juegos.
 
-La aplicación tiene una partida jugable de **Verdad o reto**. Que un juego aparezca en catálogo o tenga fondo temático no significa que su mecánica esté terminada.
+Los **11 juegos del catálogo se pueden jugar**: Verdad o reto con su propio sistema de turnos y los otros 10 con el motor común de `src/app/party/` (ver sección 6).
 
 ## 2. Tecnologías y comandos
 
@@ -56,6 +56,8 @@ Las cuentas originales Noe, Raúl, Izan y Miguel necesitan estar creadas en Supa
 - `src/app/games/`: listado, tarjetas y fichas.
 - `src/app/rooms/`: crear/entrar en salas, lobby, lotes y partida.
 - `src/app/rooms/truth-or-dare/`: selección de pregunta y reglas de Verdad o reto.
+- `src/app/party/`: motor de los otros 10 juegos. `games/*/*.logic.ts` son las reglas (funciones puras con tests en `games.logic.spec.ts`), `games/*/*-game.ts` sus pantallas, `party-store.ts` guarda con versión y reintenta, `games.ts` dice qué necesita cada juego.
+- `src/app/dev/`: página `/pruebas-juegos`, solo en builds de desarrollo: los 10 juegos con tres jugadores simulados en un servidor en memoria (sin Supabase).
 - `src/app/shared/crew/`: tripulación predeterminada y conversión de perfiles a la apariencia (`Look`) que consumen los componentes.
 - `src/app/shared/rockets/`, `pets/`, `pixel/`, `space/`, `themes/`, `sfx/`, `drink/`, `intro/`: sistemas visuales compartidos.
 - `src/environments/`: configuración de cliente por entorno.
@@ -76,7 +78,20 @@ Cada perfil guarda su configuración en `perfiles.nave` como JSON. Las referenci
 
 ## 6. Catálogo y partidas
 
-El catálogo muestra los juegos y temas disponibles. En el estado de este commit solo `verdad_o_reto` tiene la mecánica jugable. El lobby impide empezar otro juego aún no implementado.
+El catálogo muestra los 11 juegos. Cada sala tiene un juego; el anfitrión la empieza desde el lobby con el mínimo de jugadores de ese juego (2, o 3 en Secretos anónimos y ¿Quién dijo qué?) y, si el juego usa preguntas, con un lote elegido. Cualquier jugador puede pasar a la siguiente frase, carta o ronda; terminar la partida es del anfitrión.
+
+| Juego | Contenido | Cómo se juega |
+|---|---|---|
+| Yo nunca nunca | Lote por categoría | Frase a frase; quien lo ha hecho pulsa «Yo sí» y bebe. Se pueden añadir frases propias. |
+| ¿Quién es más probable? | Lote por categoría | Voto secreto a la vez; al votar el último se revela y bebe el más votado. |
+| Palabra prohibida | Lote de palabras | Cada uno recibe una palabra que ven todos menos él; quien la oye la marca. Rondas de 5, 10 o 15 min. |
+| Reglas por carta | Mazo propio (estilo «Rey») | Tragos, repartos, juegos rápidos y reglas que quedan activas (máx. 4). |
+| Tu kryptonita | Sugerencias + texto libre | En corro, cada uno elige la manía de otro (secreta o conocida). Falta leve = trago; grave = Brebaje (máx. 3 cl de alcohol, máx. 3 por persona, luego reto sin alcohol). |
+| ¿Cuánto me conoces? | Lote por categoría | Una persona por ronda responde sobre sí misma; los demás adivinan y ella marca los aciertos. |
+| Secretos anónimos | Escritos por los jugadores | Cada uno escribe secretos anónimos; se vota quién lo escribió y se revela. |
+| Mímica o Pictionary | Lote de palabras | El de turno ve la palabra y elige mímica o dibujo; el dibujo se ve en directo en todos los móviles. |
+| Tier list de amigos | Lote por categoría | Cada uno ordena a todos; sale el orden medio del grupo y las listas de cada uno. |
+| ¿Quién dijo qué? | Escritas por los jugadores | Cada uno apunta frases y quién las dijo; se vota y se revela. |
 
 Flujo de Verdad o reto:
 
@@ -123,7 +138,7 @@ Antes de ejecutar un script sobre el proyecto real, lee su cabecera y README. La
 
 ## 11. Límites actuales
 
-1. Solo Verdad o reto tiene partida completa.
+1. Los juegos nuevos necesitan `salas.sql`, `contenido.sql` y `verdad_o_reto.sql` ejecutados en Supabase (ver `supabase/README.md`).
 2. Los invitados no tienen perfiles persistentes ni nave personal.
 3. Elegir un perfil da la identidad personal de su dueño; no existe asignación de uno de los cuatro miembros fijos de la tripulación por jugador y por sala.
 4. Cada perfil puede personalizar su nave, pero eso no equivale a un editor de una plantilla común de grupo con administración compartida.

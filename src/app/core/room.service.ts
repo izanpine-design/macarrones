@@ -28,6 +28,11 @@ export type RoomErrorCode =
   | 'INVALID_LOT_NAME'
   | 'LOT_NAME_TAKEN'
   | 'NO_LOT_SELECTED'
+  | 'NETWORK'
+  | 'CONFLICT'
+  | 'NOT_A_MEMBER'
+  | 'INVALID_STATE'
+  | 'DB_OUTDATED'
   | 'UNKNOWN';
 
 const ERROR_MESSAGES: Record<RoomErrorCode, string> = {
@@ -53,6 +58,11 @@ const ERROR_MESSAGES: Record<RoomErrorCode, string> = {
   INVALID_LOT_NAME: 'El nombre del lote debe tener entre 2 y 40 caracteres.',
   LOT_NAME_TAKEN: 'Ya hay un lote con ese nombre en esta categoría.',
   NO_LOT_SELECTED: 'Elige primero un lote de preguntas.',
+  NETWORK: 'No hay conexión con el servidor. Comprueba tu internet.',
+  CONFLICT: 'Otra persona ha cambiado la partida a la vez. Vuelve a intentarlo.',
+  NOT_A_MEMBER: 'Ya no estás en esta sala.',
+  INVALID_STATE: 'La partida se ha quedado en un estado no válido.',
+  DB_OUTDATED: 'Falta actualizar la base de datos de Supabase (ejecuta supabase/salas.sql).',
   UNKNOWN: 'Ha ocurrido un error inesperado.',
 };
 
@@ -65,13 +75,34 @@ export class RoomError extends Error {
   }
 }
 
+/**
+ * The request never reached Supabase: no connection, or the browser cut it
+ * (iPhone Safari does when the page goes to the background) — "Load failed",
+ * "Failed to fetch", "NetworkError…".
+ */
+const NETWORK_ERROR = /load failed|failed to fetch|networkerror|network request failed/i;
+
+/** PostgREST cannot find an RPC: the SQL scripts have not been run yet. */
+const MISSING_FUNCTION = /could not find the function|schema cache/i;
+
 export function toRoomError(error: { message: string }): RoomError {
-  const code = error.message in ERROR_MESSAGES ? (error.message as RoomErrorCode) : 'UNKNOWN';
+  const code: RoomErrorCode = NETWORK_ERROR.test(error.message)
+    ? 'NETWORK'
+    : MISSING_FUNCTION.test(error.message)
+      ? 'DB_OUTDATED'
+    : error.message in ERROR_MESSAGES
+      ? (error.message as RoomErrorCode)
+      : 'UNKNOWN';
   return new RoomError(code, error.message);
 }
 
 /** User-facing message for any error thrown while working with rooms. */
+export function isNetworkError(error: unknown): boolean {
+  return error instanceof RoomError ? error.code === 'NETWORK' : NETWORK_ERROR.test(String(error));
+}
+
 export function roomErrorMessage(error: unknown): string {
+  if (!(error instanceof RoomError) && NETWORK_ERROR.test(String(error))) return ERROR_MESSAGES.NETWORK;
   return error instanceof Error ? error.message : String(error);
 }
 

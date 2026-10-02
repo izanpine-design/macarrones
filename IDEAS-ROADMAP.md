@@ -6,7 +6,7 @@
 
 La web ya ofrece selección de perfil con contraseña, alta de nuevos perfiles, entrada de invitados y personalización persistente de la nave. La apariencia se asocia al `user_id` de Supabase y se muestra en cohetes, lobby y aviso de bebida. La base de datos ahora incluye scripts SQL en el repo.
 
-La partida completa disponible sigue siendo **Verdad o reto**. Las otras ideas de juego/temas no están terminadas por tener presencia visual en el catálogo.
+Los 11 juegos del catálogo tienen partida completa (octubre 2026). Ver la tabla de la sección 6 de `GUIA-PAGINA.md`.
 
 ## Implementado en `master`
 
@@ -46,7 +46,7 @@ Acordar si la personalización de los cuatro perfiles la hace cada propietario c
 
 ### 4. Completar juegos
 
-**Pendiente.** Elegir el siguiente juego y terminar reglas, sincronización de estados, interfaz, salida y reconexión antes de marcarlo jugable. Mantener el botón de inicio desactivado para juegos sin mecánica implementada.
+**Hecho.** Los 10 juegos restantes son jugables con el motor común (`src/app/party/`). Ideas de mejora: frases «sobre el grupo» con anécdotas reales de la pandilla, recuperar el dibujo de Pictionary al recargar la página, y «jugar otra vez» sin volver al lobby en Secretos anónimos y ¿Quién dijo qué?.
 
 ### 5. Completar recursos del grupo fijo
 

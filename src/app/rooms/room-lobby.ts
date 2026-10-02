@@ -5,6 +5,8 @@ import { roomErrorMessage, RoomService } from '../core/room.service';
 import { RoomQuestions } from './questions/room-questions';
 import { ProfileService } from '../core/profile.service';
 import { CrewHead } from '../shared/crew/crew-head';
+import { PARTY_GAMES } from '../party/games';
+import { SupabasePartyBackend } from '../party/supabase-party-backend';
 
 const MIN_PLAYERS = 2;
 
@@ -57,7 +59,9 @@ const MIN_PLAYERS = 2;
       </div>
     </section>
 
-    <app-room-questions [room]="room()" [isHost]="isHost()" />
+    @if (usesPack()) {
+      <app-room-questions [room]="room()" [isHost]="isHost()" />
+    }
 
     @if (!isPlayable()) {
       <p class="text-body-secondary text-center">Este juego todavía no se puede jugar. ¡Pronto!</p>
@@ -94,6 +98,7 @@ const MIN_PLAYERS = 2;
 })
 export class RoomLobby {
   private readonly rooms = inject(RoomService);
+  private readonly party = inject(SupabasePartyBackend);
   private readonly window = inject(DOCUMENT).defaultView;
 
   readonly room = input.required<RoomInfo>();
@@ -108,13 +113,22 @@ export class RoomLobby {
 
   protected readonly isHost = computed(() => this.hostId() !== null && this.hostId() === this.userId());
   protected readonly isPlayable = computed(() => PLAYABLE_GAMES.includes(this.room().juego_clave ?? ''));
+  /** Rules of every game except "Verdad o reto" (null for it). */
+  private readonly partyGame = computed(() => PARTY_GAMES[this.room().juego_clave ?? ''] ?? null);
+  /** "Verdad o reto" and the games played with a question pack. */
+  protected readonly usesPack = computed(() => this.partyGame()?.usaLote ?? true);
+  private readonly minPlayers = computed(() => this.partyGame()?.minJugadores ?? MIN_PLAYERS);
+
   /** Why the game cannot start yet, or null if it can. */
   protected readonly startBlocker = computed(() => {
-    if (this.players().length < MIN_PLAYERS) {
-      return `Hacen falta al menos ${MIN_PLAYERS} jugadores. ¡Invita a alguien!`;
+    if (this.players().length < this.minPlayers()) {
+      return `Hacen falta al menos ${this.minPlayers()} jugadores. ¡Invita a alguien!`;
     }
-    if (!this.room().lote_id) {
+    if (this.usesPack() && !this.room().lote_id) {
       return 'Elige un lote de preguntas (o crea uno) para empezar.';
+    }
+    if (this.usesPack() && this.room().lote_preguntas === 0) {
+      return 'El lote elegido está vacío: añade preguntas o elige otro.';
     }
     return null;
   });
@@ -125,7 +139,17 @@ export class RoomLobby {
     this.error.set(null);
     try {
       // The page switches to the game screen through Realtime.
-      await this.rooms.startGame(this.room().id);
+      const game = this.partyGame();
+      if (!game) {
+        await this.rooms.startGame(this.room().id);
+      } else {
+        const items = game.usaLote && this.room().lote_id ? await this.party.packItems(this.room().lote_id!) : [];
+        if (items.length < game.minItems) {
+          this.error.set('El lote elegido no tiene suficientes preguntas para este juego.');
+          return;
+        }
+        await this.party.start(this.room().id, game.inicial(items, this.players().map((p) => p.user_id)));
+      }
     } catch (e) {
       this.error.set(roomErrorMessage(e));
     } finally {

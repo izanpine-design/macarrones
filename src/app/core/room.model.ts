@@ -78,7 +78,25 @@ export interface Turn {
 }
 
 /** Games whose rooms can start a game (value of `juegos.clave`). */
-export const PLAYABLE_GAMES = ['verdad_o_reto'];
+export const PLAYABLE_GAMES = [
+  'verdad_o_reto',
+  'yo_nunca',
+  'quien_es_mas_probable',
+  'palabra_prohibida',
+  'reglas_por_carta',
+  'tu_kryptonita',
+  'cuanto_me_conoces',
+  'secretos_anonimos',
+  'mimica_pictionary',
+  'tier_list',
+  'quien_dijo_que',
+];
+
+/** Games played without a question pack (their content comes from the players or the app). */
+export const GAMES_WITHOUT_PACKS = ['reglas_por_carta', 'tu_kryptonita', 'secretos_anonimos', 'quien_dijo_que'];
+
+/** Games whose pack has no categories: their rooms use "suave" without asking. */
+export const GAMES_WITHOUT_LEVELS = [...GAMES_WITHOUT_PACKS, 'palabra_prohibida', 'mimica_pictionary'];
 
 export const ROOM_CODE_LENGTH = 6;
 export const ROOM_PASSWORD_MIN_LENGTH = 4;

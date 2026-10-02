@@ -167,3 +167,6 @@
 
 /* Own background uploaded by the player (any proportions). */
 .drink__custom-bg { object-fit: cover; }
+
+/* Extra lines of the call, e.g. the recipe of a Brebaje. */
+.drink__detail { margin: -.35rem 0 .9rem; white-space: pre-line; font-size: .92rem; text-align: center; }

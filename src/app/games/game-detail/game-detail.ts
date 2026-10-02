@@ -44,7 +44,7 @@ import { PlanetBadge } from '../../shared/themes/planet-badge';
           <section class="card h-100 shadow-sm" aria-labelledby="create-room-title">
             <div class="card-body">
               <h2 id="create-room-title" class="h5 card-title">Crear sala</h2>
-              <app-create-room-form [gameId]="game.id" />
+              <app-create-room-form [gameId]="game.id" [gameClave]="game.clave" />
             </div>
           </section>
         </div>

@@ -2,8 +2,8 @@ import { inject, Service, signal } from '@angular/core';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { SupabaseService } from '../../core/supabase.service';
 
-/** Why someone drinks. */
-export type DrinkReason = 'rajado' | 'no_cumple';
+/** Why someone drinks ('otro': the text is in `motivo`). */
+export type DrinkReason = 'rajado' | 'no_cumple' | 'otro';
 
 export interface DrinkCall {
   /** Unique per call, so the same person drinking twice shows twice. */
@@ -14,6 +14,10 @@ export interface DrinkCall {
   reason: DrinkReason;
   /** Who sent it. */
   por: string;
+  /** Reason shown when `reason` is 'otro' (e.g. "Ha dicho su palabra prohibida"). */
+  motivo?: string;
+  /** Extra lines, e.g. the recipe of a Brebaje. */
+  detalle?: string;
 }
 
 const EVENT = 'beber';
@@ -74,7 +78,9 @@ function isDrinkCall(value: unknown): value is DrinkCall {
     typeof call?.id === 'string' &&
     typeof call.userId === 'string' &&
     typeof call.apodo === 'string' &&
-    (call.reason === 'rajado' || call.reason === 'no_cumple') &&
-    typeof call.por === 'string'
+    (call.reason === 'rajado' || call.reason === 'no_cumple' || call.reason === 'otro') &&
+    typeof call.por === 'string' &&
+    (call.motivo === undefined || typeof call.motivo === 'string') &&
+    (call.detalle === undefined || typeof call.detalle === 'string')
   );
 }

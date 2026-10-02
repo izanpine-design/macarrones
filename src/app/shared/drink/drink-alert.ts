@@ -16,6 +16,7 @@ const CONFETTI = ['🍝', '🍺', '🎉', '🍻', '🍝', '🥂', '🍺', '🎊'
 const REASONS = {
   rajado: 'Se ha rajado',
   no_cumple: 'No ha cumplido el reto',
+  otro: 'Le toca beber',
 } as const;
 
 /**
@@ -53,7 +54,7 @@ export class DrinkAlert {
   });
   protected readonly reason = computed(() => {
     const call = this.call();
-    return call ? `${REASONS[call.reason]} · lo dice ${call.por}` : '';
+    return call ? `${call.motivo ?? REASONS[call.reason]} · lo dice ${call.por}` : '';
   });
   protected readonly accent = computed(() => this.crew()?.color ?? '#ffcf75');
   protected readonly mug = BEER_MUG;

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { nicknameGuard } from './core/nickname.guard';
+import { DEV_ROUTES } from './dev/dev-routes';
 
 export const routes: Routes = [
   {
@@ -35,5 +36,7 @@ export const routes: Routes = [
     title: 'Sala · Macarrones',
     loadComponent: () => import('./rooms/room-page').then((m) => m.RoomPage),
   },
+  // Development builds only (empty in production, see dev/dev-routes.ts).
+  ...DEV_ROUTES,
   { path: '**', redirectTo: '' },
 ];

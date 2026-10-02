@@ -42,6 +42,9 @@
       </div>
 
       <p id="drink-reason" class="drink__reason">{{ reason() }}</p>
+      @if (c.detalle; as detalle) {
+        <p class="drink__detail">{{ detalle }}</p>
+      }
       <button type="button" class="drink__ok" autofocus (click)="close()">¡Salud! <span aria-hidden="true">🍻</span></button>
     </section>
   }
