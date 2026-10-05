@@ -12,11 +12,10 @@
 --   mimica_pictionary     a word or title to act / draw        (suave only: no categories)
 -- Categories are matched by name, so their ids do not matter.
 
-begin;
-
-create temporary table contenido_nuevo (clave text, nivel text, texto text) on commit drop;
-
-insert into contenido_nuevo (clave, nivel, texto) values
+-- A single statement (no temporary table), so it works however the SQL Editor
+-- splits the script into transactions.
+with contenido (clave, nivel, texto) as (
+  values
   -- Yo nunca nunca · suave
   ('yo_nunca', 'suave', 'Yo nunca nunca he cantado en un karaoke.'),
   ('yo_nunca', 'suave', 'Yo nunca nunca me he quedado dormido en el transporte público y me he pasado de parada.'),
@@ -299,23 +298,26 @@ insert into contenido_nuevo (clave, nivel, texto) values
   ('mimica_pictionary', 'suave', 'volcán'), ('mimica_pictionary', 'suave', 'arcoíris'), ('mimica_pictionary', 'suave', 'tormenta'),
   ('mimica_pictionary', 'suave', 'castillo'), ('mimica_pictionary', 'suave', 'faro'), ('mimica_pictionary', 'suave', 'pirámide'),
   ('mimica_pictionary', 'suave', 'Torre Eiffel'), ('mimica_pictionary', 'suave', 'Estatua de la Libertad'), ('mimica_pictionary', 'suave', 'Papá Noel'),
-  ('mimica_pictionary', 'suave', 'Michael Jackson'), ('mimica_pictionary', 'suave', 'Pepe la rana'), ('mimica_pictionary', 'suave', 'Pikachu');
-
--- A "Básico" pack for every game and category used above.
-insert into public.lotes (juego_id, nivel_id, nombre)
-select distinct j.id, n.id, 'Básico'
-from contenido_nuevo c
-join public.juegos j on j.clave = c.clave
-join public.niveles n on n.nombre = c.nivel
-on conflict (juego_id, nivel_id, nombre) do nothing;
-
--- Their items (juego_id / nivel_id are filled in from the pack by a trigger).
+  ('mimica_pictionary', 'suave', 'Michael Jackson'), ('mimica_pictionary', 'suave', 'Pepe la rana'), ('mimica_pictionary', 'suave', 'Pikachu')
+),
+-- A "Básico" pack for every game and category used above (if missing).
+nuevos_lotes as (
+  insert into public.lotes (juego_id, nivel_id, nombre)
+  select distinct j.id, n.id, 'Básico'
+  from contenido c
+  join public.juegos j on j.clave = c.clave
+  join public.niveles n on n.nombre = c.nivel
+  on conflict (juego_id, nivel_id, nombre) do nothing
+  returning id, juego_id, nivel_id
+)
+-- Their items. Packs created just above are not visible yet to this same
+-- statement, hence nuevos_lotes; juego_id / nivel_id come from the pack (trigger).
 insert into public.preguntas (texto, lote_id, tipo)
-select c.texto, l.id, null
-from contenido_nuevo c
+select c.texto, coalesce(nl.id, l.id), null
+from contenido c
 join public.juegos j on j.clave = c.clave
 join public.niveles n on n.nombre = c.nivel
-join public.lotes l on l.juego_id = j.id and l.nivel_id = n.id and l.nombre = 'Básico'
+left join nuevos_lotes nl on nl.juego_id = j.id and nl.nivel_id = n.id
+left join public.lotes l on l.juego_id = j.id and l.nivel_id = n.id and l.nombre = 'Básico'
+where coalesce(nl.id, l.id) is not null
 on conflict (lote_id, texto) do nothing;
-
-commit;
